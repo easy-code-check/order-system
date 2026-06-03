@@ -8,74 +8,96 @@
 
     <h1>メニュー管理</h1>
 
-    <h2>基本情報</h2>
+    <section>
+        <h2>基本情報</h2>
 
-    <input id="menuName" type="text" placeholder="メニュー名">
+        <label>メニュー名</label>
+        <br>
+        <input id="menuName" type="text" placeholder="例：ガンバずし定食">
+        <br><br>
+
+        <label>価格</label>
+        <br>
+        <input id="menuPrice" type="number" placeholder="例：1500">
+        <br>
+
+        <label>
+            <input id="isMarketPrice" type="checkbox">
+            時価
+        </label>
+
+        <br><br>
+
+        <label>カテゴリ</label>
+        <br>
+        <select id="menuCategory" onchange="applyCategoryTemplate()">
+            <option value="定食">定食</option>
+            <option value="丼・麺">丼・麺</option>
+            <option value="一品料理">一品料理</option>
+            <option value="活魚">活魚</option>
+            <option value="焼鳥">焼鳥</option>
+            <option value="刺身">刺身</option>
+            <option value="焼魚">焼魚</option>
+            <option value="ご飯">ご飯</option>
+            <option value="サラダ">サラダ</option>
+            <option value="デザート">デザート</option>
+            <option value="飲み物">飲み物</option>
+            <option value="その他">その他</option>
+        </select>
+
+        <br><br>
+
+        <label>説明文</label>
+        <br>
+        <textarea id="menuDescription" placeholder="セット内容・注意書きなど"></textarea>
+    </section>
+
+    <section>
+        <h2>タグ</h2>
+
+        <label>
+            <input id="isRecommended" type="checkbox">
+            おすすめ
+        </label>
+
+        <br>
+
+        <label>
+            <input id="isShimabara" type="checkbox">
+            島原名物
+        </label>
+    </section>
+
+    <section>
+        <h2>表示設定</h2>
+
+        <label>
+            <input id="isVisible" type="checkbox" checked>
+            お客さんに表示する
+        </label>
+
+        <br>
+
+        <label>
+            <input id="showNormal" type="checkbox" checked>
+            通常営業で表示
+        </label>
+
+        <br>
+
+        <label>
+            <input id="showBusy" type="checkbox" checked>
+            忙しい日も表示
+        </label>
+    </section>
+
+    <section>
+        <h2>写真設定（準備中）</h2>
+
+        <input id="menuImage" type="text" placeholder="写真URL（今は空欄でOK）">
+    </section>
+
     <br>
-
-    <input id="menuPrice" type="number" placeholder="価格">
-    <br>
-
-    <label>
-        <input id="isMarketPrice" type="checkbox">
-        時価
-    </label>
-
-    <br>
-
-    <select id="menuCategory">
-        <option value="定食">定食</option>
-        <option value="丼・麺">丼・麺</option>
-        <option value="一品料理">一品料理</option>
-        <option value="活魚">活魚</option>
-        <option value="焼鳥">焼鳥</option>
-        <option value="刺身">刺身</option>
-        <option value="焼魚">焼魚</option>
-        <option value="ご飯">ご飯</option>
-        <option value="サラダ">サラダ</option>
-        <option value="デザート">デザート</option>
-        <option value="飲み物">飲み物</option>
-        <option value="その他">その他</option>
-    </select>
-
-    <br>
-
-    <textarea id="menuDescription" placeholder="説明文（セット内容など・空欄OK）"></textarea>
-
-    <h2>タグ</h2>
-
-    <label>
-        <input id="isRecommended" type="checkbox">
-        おすすめ
-    </label>
-
-    <label>
-        <input id="isShimabara" type="checkbox">
-        島原名物
-    </label>
-
-    <h2>表示設定</h2>
-
-    <label>
-        <input id="isVisible" type="checkbox" checked>
-        お客さんに表示する
-    </label>
-
-    <br>
-
-    <label>
-        <input id="showNormal" type="checkbox" checked>
-        通常営業で表示
-    </label>
-
-    <br>
-
-    <label>
-        <input id="showBusy" type="checkbox" checked>
-        忙しい日も表示
-    </label>
-
-    <br><br>
 
     <button id="saveButton" onclick="saveMenu()">追加</button>
 
@@ -115,6 +137,7 @@
             const showNormal = document.getElementById("showNormal").checked;
             const showBusy = document.getElementById("showBusy").checked;
             const isMarketPrice = document.getElementById("isMarketPrice").checked;
+            const image = document.getElementById("menuImage").value;
 
             if (name === "") {
                 alert("メニュー名を入力してください");
@@ -136,7 +159,8 @@
                 isVisible: isVisible,
                 showNormal: showNormal,
                 showBusy: showBusy,
-                isMarketPrice: isMarketPrice
+                isMarketPrice: isMarketPrice,
+                image: image
             };
 
             if (editIndex === null) {
@@ -214,6 +238,7 @@
                         <br>
                         ${tags ? "タグ：" + tags + "<br>" : ""}
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                        ${menu.image ? "写真：" + menu.image + "<br>" : ""}
                         <button onclick="editMenu(${index})">編集</button>
                         <button onclick="deleteMenu(${index})">削除</button>
                     `;
@@ -224,6 +249,16 @@
                 details.appendChild(ul);
                 menuList.appendChild(details);
             });
+        }
+
+        function applyCategoryTemplate() {
+            const category = document.getElementById("menuCategory").value;
+            const description = document.getElementById("menuDescription");
+
+            if (category === "活魚" && description.value === "") {
+                description.value = "水槽からお選びください。価格は大きさ・状態によって異なります。";
+                document.getElementById("isMarketPrice").checked = true;
+            }
         }
 
         function getPriceText(menu) {
@@ -261,6 +296,7 @@
             document.getElementById("showNormal").checked = menu.showNormal !== false;
             document.getElementById("showBusy").checked = menu.showBusy !== false;
             document.getElementById("isMarketPrice").checked = menu.isMarketPrice || false;
+            document.getElementById("menuImage").value = menu.image || "";
 
             editIndex = index;
             document.getElementById("saveButton").textContent = "更新";
@@ -276,6 +312,7 @@
             document.getElementById("menuName").value = "";
             document.getElementById("menuPrice").value = "";
             document.getElementById("menuDescription").value = "";
+            document.getElementById("menuImage").value = "";
             document.getElementById("isRecommended").checked = false;
             document.getElementById("isShimabara").checked = false;
             document.getElementById("isVisible").checked = true;
