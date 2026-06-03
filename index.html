@@ -8,8 +8,20 @@
 
     <h1>メニュー管理</h1>
 
+    <h2>基本情報</h2>
+
     <input id="menuName" type="text" placeholder="メニュー名">
+    <br>
+
     <input id="menuPrice" type="number" placeholder="価格">
+    <br>
+
+    <label>
+        <input id="isMarketPrice" type="checkbox">
+        時価
+    </label>
+
+    <br>
 
     <select id="menuCategory">
         <option value="定食">定食</option>
@@ -28,6 +40,10 @@
 
     <br>
 
+    <textarea id="menuDescription" placeholder="説明文（セット内容など・空欄OK）"></textarea>
+
+    <h2>タグ</h2>
+
     <label>
         <input id="isRecommended" type="checkbox">
         おすすめ
@@ -38,7 +54,7 @@
         島原名物
     </label>
 
-    <br>
+    <h2>表示設定</h2>
 
     <label>
         <input id="isVisible" type="checkbox" checked>
@@ -47,9 +63,19 @@
 
     <br>
 
-    <textarea id="menuDescription" placeholder="説明文（セット内容など・空欄OK）"></textarea>
+    <label>
+        <input id="showNormal" type="checkbox" checked>
+        通常営業で表示
+    </label>
 
     <br>
+
+    <label>
+        <input id="showBusy" type="checkbox" checked>
+        忙しい日も表示
+    </label>
+
+    <br><br>
 
     <button id="saveButton" onclick="saveMenu()">追加</button>
 
@@ -86,9 +112,17 @@
             const isRecommended = document.getElementById("isRecommended").checked;
             const isShimabara = document.getElementById("isShimabara").checked;
             const isVisible = document.getElementById("isVisible").checked;
+            const showNormal = document.getElementById("showNormal").checked;
+            const showBusy = document.getElementById("showBusy").checked;
+            const isMarketPrice = document.getElementById("isMarketPrice").checked;
 
-            if (name === "" || price === "") {
-                alert("メニュー名と価格を入力してください");
+            if (name === "") {
+                alert("メニュー名を入力してください");
+                return;
+            }
+
+            if (!isMarketPrice && price === "") {
+                alert("価格を入力するか、時価にチェックを入れてください");
                 return;
             }
 
@@ -99,7 +133,10 @@
                 description: description,
                 isRecommended: isRecommended,
                 isShimabara: isShimabara,
-                isVisible: isVisible
+                isVisible: isVisible,
+                showNormal: showNormal,
+                showBusy: showBusy,
+                isMarketPrice: isMarketPrice
             };
 
             if (editIndex === null) {
@@ -129,6 +166,9 @@
                         const menu = item.menu;
                         const tags = getTagsText(menu);
                         const visibleText = menu.isVisible === false ? "非表示" : "表示中";
+                        const normalText = menu.showNormal === false ? "通常なし" : "通常";
+                        const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
+                        const priceText = getPriceText(menu);
 
                         const isSameCategory = menu.category === category;
                         const isSearchMatch =
@@ -136,7 +176,10 @@
                             (menu.description || "").includes(searchText) ||
                             menu.category.includes(searchText) ||
                             tags.includes(searchText) ||
-                            visibleText.includes(searchText);
+                            visibleText.includes(searchText) ||
+                            normalText.includes(searchText) ||
+                            busyText.includes(searchText) ||
+                            priceText.includes(searchText);
 
                         return isSameCategory && isSearchMatch;
                     });
@@ -159,13 +202,15 @@
                     const index = item.index;
                     const tags = getTagsText(menu);
                     const visibleText = menu.isVisible === false ? "非表示" : "表示中";
+                    const normalText = menu.showNormal === false ? "通常なし" : "通常";
+                    const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
 
                     const li = document.createElement("li");
 
                     li.innerHTML = `
-                        <strong>${menu.name}</strong>：${menu.price}円
+                        <strong>${menu.name}</strong>：${getPriceText(menu)}
                         <br>
-                        状態：${visibleText}
+                        状態：${visibleText} / ${normalText} / ${busyText}
                         <br>
                         ${tags ? "タグ：" + tags + "<br>" : ""}
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
@@ -179,6 +224,14 @@
                 details.appendChild(ul);
                 menuList.appendChild(details);
             });
+        }
+
+        function getPriceText(menu) {
+            if (menu.isMarketPrice) {
+                return "時価";
+            }
+
+            return menu.price + "円";
         }
 
         function getTagsText(menu) {
@@ -199,12 +252,15 @@
             const menu = menus[index];
 
             document.getElementById("menuName").value = menu.name;
-            document.getElementById("menuPrice").value = menu.price;
+            document.getElementById("menuPrice").value = menu.price || "";
             document.getElementById("menuCategory").value = menu.category;
             document.getElementById("menuDescription").value = menu.description || "";
             document.getElementById("isRecommended").checked = menu.isRecommended || false;
             document.getElementById("isShimabara").checked = menu.isShimabara || false;
             document.getElementById("isVisible").checked = menu.isVisible !== false;
+            document.getElementById("showNormal").checked = menu.showNormal !== false;
+            document.getElementById("showBusy").checked = menu.showBusy !== false;
+            document.getElementById("isMarketPrice").checked = menu.isMarketPrice || false;
 
             editIndex = index;
             document.getElementById("saveButton").textContent = "更新";
@@ -223,6 +279,9 @@
             document.getElementById("isRecommended").checked = false;
             document.getElementById("isShimabara").checked = false;
             document.getElementById("isVisible").checked = true;
+            document.getElementById("showNormal").checked = true;
+            document.getElementById("showBusy").checked = true;
+            document.getElementById("isMarketPrice").checked = false;
         }
 
         function saveMenus() {
