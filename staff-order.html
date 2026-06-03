@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>スタッフ注文画面</title>
 
+<style>
+body {
+  font-family: sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 16px;
+}
+
+h1 {
+  text-align: center;
+}
+
+section {
+  background: white;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+}
+
+select, button {
+  font-size: 16px;
+  padding: 8px;
+  margin-top: 6px;
+}
+
+select {
+  width: 100%;
+}
+
+button {
+  border: none;
+  border-radius: 6px;
+  background: #333;
+  color: white;
+}
+
+.menu-item {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+}
+
+.menu-name {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.menu-price {
+  color: #555;
+}
+
+.cart-item {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.small-button {
+  margin-left: 4px;
+  padding: 4px 8px;
+}
+
+#submitButton {
+  width: 100%;
+  background: #d35400;
+  font-size: 18px;
+  padding: 12px;
+}
+
+.empty {
+  color: #777;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<h1>スタッフ注文画面</h1>
+
+<section>
+  <h2>席番号</h2>
+  <select id="tableNumber">
+    <option value="">席を選択してください</option>
+  </select>
+</section>
+
+<section>
+  <h2>メニュー</h2>
+  <div id="menuList"></div>
+</section>
+
+<section>
+  <h2>注文内容</h2>
+  <div id="cartList"></div>
+  <p>合計：<span id="totalPrice">0</span>円</p>
+  <button id="submitButton" onclick="submitOrder()">注文送信</button>
+</section>
+
+<script>
+const MENU_KEY = "orderSystemMenus";
+const ORDER_KEY = "orderSystemOrders";
+
+const TABLES = [
+  "1", "2", "3", "4", "5", "6", "7", "8",
+  "10", "11", "12",
+  "13A", "13B", "13C",
+  "14", "15", "16", "17", "18",
+  "VIP"
+];
+
+let menus = [];
+let cart = [];
+
+function createTableOptions() {
+  const select = document.getElementById("tableNumber");
+
+  TABLES.forEach(table => {
+    const option = document.createElement("option");
+    option.value = table;
+    option.textContent = table + "席";
+    select.appendChild(option);
+  });
+}
+
+function loadMenus() {
+  menus = JSON.parse(localStorage.getItem(MENU_KEY) || "[]");
+  renderMenus();
+}
+
+function renderMenus() {
+  const menuList = document.getElementById("menuList");
+  menuList.innerHTML = "";
+
+  if (menus.length === 0) {
+    menuList.innerHTML = '<p class="empty">メニューが登録されていません。</p>';
+    return;
+  }
+
+  menus.forEach((menu, index) => {
+    const div = document.createElement("div");
+    div.className = "menu-item";
+
+    div.innerHTML = `
+      <div class="menu-name">${menu.name}</div>
+      <div class="menu-price">${menu.price}円</div>
+      <button onclick="addToCart(${index})">追加</button>
+    `;
+
+    menuList.appendChild(div);
+  });
+}
+
+function addToCart(index) {
+  const menu = menus[index];
+
+  const existingItem = cart.find(item => item.name === menu.name);
+
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    cart.push({
+      name: menu.name,
+      price: Number(menu.price),
+      quantity: 1
+    });
+  }
+
+  renderCart();
+}
+
+function renderCart() {
+  const cartList = document.getElementById("cartList");
+  const totalPrice = document.getElementById("totalPrice");
+
+  cartList.innerHTML = "";
+
+  if (cart.length === 0) {
+    cartList.innerHTML = '<p class="empty">まだ注文がありません。</p>';
+    totalPrice.textContent = "0";
+    return;
+  }
+
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    total += item.price * item.quantity;
+
+    const div = document.createElement("div");
+    div.className = "cart-item";
+
+    div.innerHTML = `
+      <strong>${item.name}</strong><br>
+      ${item.price}円 × ${item.quantity}個
+      ＝ ${item.price * item.quantity}円<br>
+
+      <button class="small-button" onclick="decreaseItem(${index})">−</button>
+      <button class="small-button" onclick="increaseItem(${index})">＋</button>
+      <button class="small-button" onclick="removeItem(${index})">削除</button>
+    `;
+
+    cartList.appendChild(div);
+  });
+
+  totalPrice.textContent = total;
+}
+
+function increaseItem(index) {
+  cart[index].quantity++;
+  renderCart();
+}
+
+function decreaseItem(index) {
+  cart[index].quantity--;
+
+  if (cart[index].quantity <= 0) {
+    cart.splice(index, 1);
+  }
+
+  renderCart();
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
+
+function submitOrder() {
+  const tableNumber = document.getElementById("tableNumber").value;
+
+  if (!tableNumber) {
+    alert("席番号を選択してください。");
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert("注文内容がありません。");
+    return;
+  }
+
+  const orders = JSON.parse(localStorage.getItem(ORDER_KEY) || "[]");
+
+  const order = {
+    id: Date.now(),
+    table: tableNumber,
+    items: cart,
+    status: "未対応",
+    paid: false,
+    createdAt: new Date().toLocaleString()
+  };
+
+  orders.push(order);
+
+  localStorage.setItem(ORDER_KEY, JSON.stringify(orders));
+
+  alert(tableNumber + "席の注文を送信しました。");
+
+  cart = [];
+  renderCart();
+}
+
+createTableOptions();
+loadMenus();
+renderCart();
+</script>
+
+</body>
+</html>
