@@ -26,15 +26,16 @@
 
     <br>
 
-    <button onclick="addMenu()">追加</button>
+    <button id="saveButton" onclick="saveMenu()">追加</button>
 
     <h2>メニュー一覧</h2>
     <ul id="menuList"></ul>
 
     <script>
         let menus = [];
+        let editIndex = null;
 
-        function addMenu() {
+        function saveMenu() {
             const name = document.getElementById("menuName").value;
             const price = document.getElementById("menuPrice").value;
             const category = document.getElementById("menuCategory").value;
@@ -52,13 +53,17 @@
                 description: description
             };
 
-            menus.push(menu);
+            if (editIndex === null) {
+                menus.push(menu);
+            } else {
+                menus[editIndex] = menu;
+                editIndex = null;
+                document.getElementById("saveButton").textContent = "追加";
+            }
+
             saveMenus();
             showMenus();
-
-            document.getElementById("menuName").value = "";
-            document.getElementById("menuPrice").value = "";
-            document.getElementById("menuDescription").value = "";
+            clearForm();
         }
 
         function showMenus() {
@@ -74,6 +79,7 @@
                     カテゴリ：${menu.category}
                     <br>
                     ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                    <button onclick="editMenu(${index})">編集</button>
                     <button onclick="deleteMenu(${index})">削除</button>
                 `;
 
@@ -81,10 +87,28 @@
             });
         }
 
+        function editMenu(index) {
+            const menu = menus[index];
+
+            document.getElementById("menuName").value = menu.name;
+            document.getElementById("menuPrice").value = menu.price;
+            document.getElementById("menuCategory").value = menu.category;
+            document.getElementById("menuDescription").value = menu.description;
+
+            editIndex = index;
+            document.getElementById("saveButton").textContent = "更新";
+        }
+
         function deleteMenu(index) {
             menus.splice(index, 1);
             saveMenus();
             showMenus();
+        }
+
+        function clearForm() {
+            document.getElementById("menuName").value = "";
+            document.getElementById("menuPrice").value = "";
+            document.getElementById("menuDescription").value = "";
         }
 
         function saveMenus() {
