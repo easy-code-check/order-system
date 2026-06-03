@@ -252,6 +252,10 @@ function showMenus() {
     ">
         ${menu.image ? "詳細・写真" : "詳細"}
     </summary>
+    ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
+    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+    ${itemsHtml}
+    </details>
 
                 <div class="menu-buttons">
                     <button type="button" onclick="moveMenuUp(${index})">↑</button>
