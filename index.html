@@ -59,6 +59,7 @@
         summary {
             font-weight: bold;
             font-size: 18px;
+            cursor: pointer;
         }
 
         li {
@@ -277,17 +278,21 @@
                 const details = document.createElement("details");
                 details.open = searchText !== "" || openCategory === category;
 
-                details.addEventListener("toggle", function() {
-                    if (details.open) {
-                        openCategory = category;
-                        showMenus();
-                    } else if (openCategory === category) {
-                        openCategory = null;
-                    }
-                });
-
                 const summary = document.createElement("summary");
                 summary.textContent = category + "（" + categoryMenus.length + "件）";
+
+                summary.addEventListener("click", function(event) {
+                    event.preventDefault();
+
+                    if (openCategory === category) {
+                        openCategory = null;
+                    } else {
+                        openCategory = category;
+                    }
+
+                    showMenus();
+                });
+
                 details.appendChild(summary);
 
                 const ul = document.createElement("ul");
