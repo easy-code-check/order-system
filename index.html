@@ -16,7 +16,7 @@
             text-align: center;
         }
 
-        section {
+        section, details {
             background: white;
             padding: 16px;
             margin-bottom: 16px;
@@ -54,13 +54,6 @@
             padding: 12px;
             font-size: 18px;
             background: #007bff;
-        }
-
-        details {
-            background: white;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 8px;
         }
 
         summary {
@@ -177,6 +170,7 @@
     <script>
         let menus = [];
         let editIndex = null;
+        let openCategory = null;
 
         const categories = [
             "定食",
@@ -217,17 +211,17 @@
             }
 
             const menu = {
-                name: name,
-                price: price,
-                category: category,
-                description: description,
-                isRecommended: isRecommended,
-                isShimabara: isShimabara,
-                isVisible: isVisible,
-                showNormal: showNormal,
-                showBusy: showBusy,
-                isMarketPrice: isMarketPrice,
-                image: image
+                name,
+                price,
+                category,
+                description,
+                isRecommended,
+                isShimabara,
+                isVisible,
+                showNormal,
+                showBusy,
+                isMarketPrice,
+                image
             };
 
             if (editIndex === null) {
@@ -237,6 +231,8 @@
                 editIndex = null;
                 document.getElementById("saveButton").textContent = "追加";
             }
+
+            openCategory = category;
 
             saveMenus();
             showMenus();
@@ -251,7 +247,7 @@
             categories.forEach(function(category) {
                 const categoryMenus = menus
                     .map(function(menu, index) {
-                        return { menu: menu, index: index };
+                        return { menu, index };
                     })
                     .filter(function(item) {
                         const menu = item.menu;
@@ -261,18 +257,17 @@
                         const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
                         const priceText = getPriceText(menu);
 
-                        const isSameCategory = menu.category === category;
-                        const isSearchMatch =
-                            menu.name.includes(searchText) ||
-                            (menu.description || "").includes(searchText) ||
-                            menu.category.includes(searchText) ||
-                            tags.includes(searchText) ||
-                            visibleText.includes(searchText) ||
-                            normalText.includes(searchText) ||
-                            busyText.includes(searchText) ||
-                            priceText.includes(searchText);
-
-                        return isSameCategory && isSearchMatch;
+                        return menu.category === category &&
+                            (
+                                menu.name.includes(searchText) ||
+                                (menu.description || "").includes(searchText) ||
+                                menu.category.includes(searchText) ||
+                                tags.includes(searchText) ||
+                                visibleText.includes(searchText) ||
+                                normalText.includes(searchText) ||
+                                busyText.includes(searchText) ||
+                                priceText.includes(searchText)
+                            );
                     });
 
                 if (categoryMenus.length === 0) {
@@ -280,7 +275,16 @@
                 }
 
                 const details = document.createElement("details");
-                details.open = searchText !== "";
+                details.open = searchText !== "" || openCategory === category;
+
+                details.addEventListener("toggle", function() {
+                    if (details.open) {
+                        openCategory = category;
+                        showMenus();
+                    } else if (openCategory === category) {
+                        openCategory = null;
+                    }
+                });
 
                 const summary = document.createElement("summary");
                 summary.textContent = category + "（" + categoryMenus.length + "件）";
@@ -307,10 +311,10 @@
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
                         ${menu.image ? "写真：" + menu.image + "<br>" : ""}
                         <div class="menu-buttons">
-                            <button onclick="moveMenuUp(${index})">↑</button>
-                            <button onclick="moveMenuDown(${index})">↓</button>
-                            <button onclick="editMenu(${index})">編集</button>
-                            <button onclick="deleteMenu(${index})">削除</button>
+                            <button type="button" onclick="moveMenuUp(${index})">↑</button>
+                            <button type="button" onclick="moveMenuDown(${index})">↓</button>
+                            <button type="button" onclick="editMenu(${index})">編集</button>
+                            <button type="button" onclick="deleteMenu(${index})">削除</button>
                         </div>
                     `;
 
@@ -345,11 +349,7 @@
         }
 
         function getPriceText(menu) {
-            if (menu.isMarketPrice) {
-                return "時価";
-            }
-
-            return menu.price + "円";
+            return menu.isMarketPrice ? "時価" : menu.price + "円";
         }
 
         function getTagsText(menu) {
@@ -382,10 +382,13 @@
             document.getElementById("menuImage").value = menu.image || "";
 
             editIndex = index;
+            openCategory = menu.category;
             document.getElementById("saveButton").textContent = "更新";
+            showMenus();
         }
 
         function deleteMenu(index) {
+            openCategory = menus[index].category;
             menus.splice(index, 1);
             saveMenus();
             showMenus();
@@ -393,6 +396,7 @@
 
         function moveMenuUp(index) {
             const currentMenu = menus[index];
+            openCategory = currentMenu.category;
 
             for (let i = index - 1; i >= 0; i--) {
                 if (menus[i].category === currentMenu.category) {
@@ -409,6 +413,7 @@
 
         function moveMenuDown(index) {
             const currentMenu = menus[index];
+            openCategory = currentMenu.category;
 
             for (let i = index + 1; i < menus.length; i++) {
                 if (menus[i].category === currentMenu.category) {
