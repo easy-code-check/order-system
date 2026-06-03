@@ -29,11 +29,23 @@
     <button id="saveButton" onclick="saveMenu()">追加</button>
 
     <h2>メニュー一覧</h2>
-    <ul id="menuList"></ul>
+
+    <input id="searchText" type="text" placeholder="メニュー検索" oninput="showMenus()">
+
+    <div id="menuList"></div>
 
     <script>
         let menus = [];
         let editIndex = null;
+
+        const categories = [
+            "おすすめ・島原名物",
+            "定食",
+            "丼・麺",
+            "一品料理",
+            "飲み物",
+            "その他"
+        ];
 
         function saveMenu() {
             const name = document.getElementById("menuName").value;
@@ -68,22 +80,58 @@
 
         function showMenus() {
             const menuList = document.getElementById("menuList");
+            const searchText = document.getElementById("searchText").value;
             menuList.innerHTML = "";
 
-            menus.forEach(function(menu, index) {
-                const li = document.createElement("li");
+            categories.forEach(function(category) {
+                const categoryMenus = menus
+                    .map(function(menu, index) {
+                        return { menu: menu, index: index };
+                    })
+                    .filter(function(item) {
+                        const menu = item.menu;
 
-                li.innerHTML = `
-                    <strong>${menu.name}</strong>：${menu.price}円
-                    <br>
-                    カテゴリ：${menu.category}
-                    <br>
-                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-                    <button onclick="editMenu(${index})">編集</button>
-                    <button onclick="deleteMenu(${index})">削除</button>
-                `;
+                        const isSameCategory = menu.category === category;
+                        const isSearchMatch =
+                            menu.name.includes(searchText) ||
+                            menu.description.includes(searchText) ||
+                            menu.category.includes(searchText);
 
-                menuList.appendChild(li);
+                        return isSameCategory && isSearchMatch;
+                    });
+
+                if (categoryMenus.length === 0) {
+                    return;
+                }
+
+                const details = document.createElement("details");
+                details.open = searchText !== "";
+
+                const summary = document.createElement("summary");
+                summary.textContent = category + "（" + categoryMenus.length + "件）";
+                details.appendChild(summary);
+
+                const ul = document.createElement("ul");
+
+                categoryMenus.forEach(function(item) {
+                    const menu = item.menu;
+                    const index = item.index;
+
+                    const li = document.createElement("li");
+
+                    li.innerHTML = `
+                        <strong>${menu.name}</strong>：${menu.price}円
+                        <br>
+                        ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                        <button onclick="editMenu(${index})">編集</button>
+                        <button onclick="deleteMenu(${index})">削除</button>
+                    `;
+
+                    ul.appendChild(li);
+                });
+
+                details.appendChild(ul);
+                menuList.appendChild(details);
             });
         }
 
