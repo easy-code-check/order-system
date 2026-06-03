@@ -2,377 +2,480 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>飲食店注文システム</title>
+<title>order-system</title>
 
 <style>
-body {
-  font-family: sans-serif;
-  background: #f5f5f5;
-  margin: 0;
-  padding: 12px;
-}
-
-h1 {
-  text-align: center;
-  font-size: 24px;
-}
-
-nav {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-nav button {
-  flex: 1;
-  background: #555;
-}
-
-section {
-  background: white;
-  padding: 14px;
-  margin-bottom: 14px;
-  border-radius: 10px;
-}
-
-input, select, textarea, button {
-  font-size: 16px;
-  padding: 8px;
-  margin-top: 6px;
-  box-sizing: border-box;
-}
-
-input, select, textarea {
-  width: 100%;
-}
-
-button {
-  border: none;
-  border-radius: 6px;
-  background: #333;
-  color: white;
-}
-
-.danger {
-  background: #c0392b;
-}
-
-.orange {
-  background: #d35400;
-}
-
-.menu-item, .cart-item {
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0;
-}
-
-.menu-name {
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.small-button {
-  padding: 5px 8px;
-  margin-right: 4px;
-}
-
-.empty {
-  color: #777;
-  text-align: center;
-}
+body { font-family: sans-serif; background: #f5f5f5; margin: 0; padding: 16px; }
+h1 { text-align: center; }
+section, details { background: white; padding: 16px; margin-bottom: 16px; border-radius: 10px; }
+input, select, textarea, button { font-size: 16px; padding: 8px; margin-top: 6px; box-sizing: border-box; }
+input[type="text"], input[type="number"], select, textarea { width: 100%; }
+textarea { height: 80px; }
+#menuItems { height: 120px; }
+button { border: none; border-radius: 6px; background: #333; color: white; margin: 4px; }
+.save-button { width: 100%; padding: 12px; font-size: 18px; background: #007bff; }
+summary { font-weight: bold; font-size: 18px; cursor: pointer; }
+li { margin-bottom: 16px; line-height: 1.6; }
+.menu-buttons button { background: #555; }
+.menu-photo { width: 100%; max-width: 300px; border-radius: 10px; margin-top: 10px; }
+#imagePreview { width: 100%; max-width: 300px; border-radius: 10px; margin-top: 10px; display: none; }
 </style>
 </head>
 
 <body>
 
-<h1>飲食店注文システム</h1>
+<h1>メニュー管理</h1>
 
-<nav>
-  <button onclick="showTab('menuTab')">メニュー管理</button>
-  <button onclick="showTab('orderTab')">スタッフ注文</button>
-</nav>
+<section>
+<h2>基本情報</h2>
 
-<div id="menuTab">
+<label>メニュー名</label>
+<input id="menuName" type="text" placeholder="例：ガンバずし定食">
 
-  <section>
-    <h2>メニュー追加</h2>
+<br><br>
 
-    <input type="text" id="menuName" placeholder="メニュー名">
-    <input type="number" id="menuPrice" placeholder="金額">
+<label>価格</label>
+<input id="menuPrice" type="number" placeholder="例：1500">
 
-    <button onclick="addMenu()">追加</button>
-  </section>
+<label>
+<input id="isMarketPrice" type="checkbox">
+時価
+</label>
 
-  <section>
-    <h2>登録済みメニュー</h2>
-    <div id="menuManageList"></div>
-  </section>
+<br><br>
 
-</div>
+<label>カテゴリ</label>
+<select id="menuCategory" onchange="applyCategoryTemplate()">
+<option value="定食">定食</option>
+<option value="丼・麺">丼・麺</option>
+<option value="一品料理">一品料理</option>
+<option value="活魚">活魚</option>
+<option value="焼鳥">焼鳥</option>
+<option value="刺身">刺身</option>
+<option value="焼魚">焼魚</option>
+<option value="ご飯">ご飯</option>
+<option value="サラダ">サラダ</option>
+<option value="デザート">デザート</option>
+<option value="飲み物">飲み物</option>
+<option value="その他">その他</option>
+</select>
 
-<div id="orderTab" style="display:none;">
+<br><br>
 
-  <section>
-    <h2>席番号</h2>
-    <select id="tableNumber">
-      <option value="">席を選択してください</option>
-    </select>
-  </section>
+<label>説明文</label>
+<textarea id="menuDescription" placeholder="例：島原名物を楽しめる人気セットです"></textarea>
 
-  <section>
-    <h2>メニュー</h2>
-    <div id="orderMenuList"></div>
-  </section>
+<br><br>
 
-  <section>
-    <h2>注文内容</h2>
-    <div id="cartList"></div>
-    <p>合計：<span id="totalPrice">0</span>円</p>
-    <button class="orange" onclick="submitOrder()">注文送信</button>
-  </section>
+<label>内容（1行ずつ入力）</label>
+<textarea id="menuItems" placeholder="例：
+具雑煮
+ガンバずし
+かんざらし"></textarea>
+</section>
 
-</div>
+<section>
+<h2>タグ</h2>
+<label><input id="isRecommended" type="checkbox"> おすすめ</label>
+<br>
+<label><input id="isShimabara" type="checkbox"> 島原名物</label>
+</section>
+
+<section>
+<h2>表示設定</h2>
+<label><input id="isVisible" type="checkbox" checked> お客さんに表示する</label>
+<br>
+<label><input id="showNormal" type="checkbox" checked> 通常営業で表示</label>
+<br>
+<label><input id="showBusy" type="checkbox" checked> 忙しい日も表示</label>
+</section>
+
+<section>
+<h2>写真設定</h2>
+<input id="menuImageFile" type="file" accept="image/*" onchange="handleImageSelect(event)">
+<br>
+<img id="imagePreview">
+<br>
+<button type="button" onclick="clearImage()">写真を削除</button>
+</section>
+
+<button id="saveButton" class="save-button" onclick="saveMenu()">追加</button>
+
+<h2>メニュー一覧</h2>
+<input id="searchText" type="text" placeholder="メニュー検索" oninput="showMenus()">
+<div id="menuList"></div>
 
 <script>
-const MENU_KEY = "orderSystemMenus";
-const ORDER_KEY = "orderSystemOrders";
+let menus = [];
+let editIndex = null;
+let openCategory = null;
+let openMenuDetail = null;
+let currentImage = "";
 
-const TABLES = [
-  "1", "2", "3", "4", "5", "6", "7", "8",
-  "10", "11", "12",
-  "13A", "13B", "13C",
-  "14", "15", "16", "17", "18",
-  "VIP"
+const categories = [
+    "定食", "丼・麺", "一品料理", "活魚", "焼鳥", "刺身",
+    "焼魚", "ご飯", "サラダ", "デザート", "飲み物", "その他"
 ];
 
-let menus = [];
-let cart = [];
+function saveMenu() {
+    const name = document.getElementById("menuName").value;
+    const price = document.getElementById("menuPrice").value;
+    const category = document.getElementById("menuCategory").value;
+    const description = document.getElementById("menuDescription").value;
+    const itemsText = document.getElementById("menuItems").value;
+    const isRecommended = document.getElementById("isRecommended").checked;
+    const isShimabara = document.getElementById("isShimabara").checked;
+    const isVisible = document.getElementById("isVisible").checked;
+    const showNormal = document.getElementById("showNormal").checked;
+    const showBusy = document.getElementById("showBusy").checked;
+    const isMarketPrice = document.getElementById("isMarketPrice").checked;
 
-function showTab(tabId) {
-  document.getElementById("menuTab").style.display = "none";
-  document.getElementById("orderTab").style.display = "none";
+    if (name === "") {
+        alert("メニュー名を入力してください");
+        return;
+    }
 
-  document.getElementById(tabId).style.display = "block";
+    if (!isMarketPrice && price === "") {
+        alert("価格を入力するか、時価にチェックを入れてください");
+        return;
+    }
 
-  loadMenus();
-  renderCart();
+    const menu = {
+        name,
+        price,
+        category,
+        description,
+        itemsText,
+        isRecommended,
+        isShimabara,
+        isVisible,
+        showNormal,
+        showBusy,
+        isMarketPrice,
+        image: currentImage
+    };
+
+    if (editIndex === null) {
+        menus.push(menu);
+    } else {
+        menus[editIndex] = menu;
+        editIndex = null;
+        document.getElementById("saveButton").textContent = "追加";
+    }
+
+    openCategory = category;
+
+    saveMenus();
+    showMenus();
+    clearForm();
 }
 
-function createTableOptions() {
-  const select = document.getElementById("tableNumber");
+function showMenus() {
+    const menuList = document.getElementById("menuList");
+    const searchText = document.getElementById("searchText").value;
+    menuList.innerHTML = "";
 
-  TABLES.forEach(table => {
-    const option = document.createElement("option");
-    option.value = table;
-    option.textContent = table + "席";
-    select.appendChild(option);
-  });
+    categories.forEach(function(category) {
+        const categoryMenus = menus
+            .map(function(menu, index) {
+                return { menu, index };
+            })
+            .filter(function(item) {
+                const menu = item.menu;
+                const tags = getTagsText(menu);
+                const visibleText = menu.isVisible === false ? "非表示" : "表示中";
+                const normalText = menu.showNormal === false ? "通常なし" : "通常";
+                const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
+                const priceText = getPriceText(menu);
+
+                return menu.category === category &&
+                    (
+                        menu.name.includes(searchText) ||
+                        (menu.description || "").includes(searchText) ||
+                        (menu.itemsText || "").includes(searchText) ||
+                        menu.category.includes(searchText) ||
+                        tags.includes(searchText) ||
+                        visibleText.includes(searchText) ||
+                        normalText.includes(searchText) ||
+                        busyText.includes(searchText) ||
+                        priceText.includes(searchText)
+                    );
+            });
+
+        if (categoryMenus.length === 0) return;
+
+        const details = document.createElement("details");
+        details.open = searchText !== "" || openCategory === category;
+
+        const summary = document.createElement("summary");
+        summary.textContent = category + "（" + categoryMenus.length + "件）";
+
+        summary.addEventListener("click", function(event) {
+            event.preventDefault();
+            openCategory = openCategory === category ? null : category;
+            showMenus();
+        });
+
+        details.appendChild(summary);
+
+        const ul = document.createElement("ul");
+
+        categoryMenus.forEach(function(item) {
+            const menu = item.menu;
+            const index = item.index;
+            const tags = getTagsText(menu);
+            const visibleText = menu.isVisible === false ? "非表示" : "表示中";
+            const normalText = menu.showNormal === false ? "通常なし" : "通常";
+            const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
+            const itemsHtml = getItemsHtml(menu.itemsText);
+            const detailId = category + "-" + index;
+            const li = document.createElement("li");
+
+            li.innerHTML = `
+                <strong>${menu.name}</strong>：${getPriceText(menu)}
+                <br>
+                状態：${visibleText} / ${normalText} / ${busyText}
+                <br>
+                ${tags ? "タグ：" + tags + "<br>" : ""}
+
+                <details ${openMenuDetail === detailId ? "open" : ""}>
+    <summary onclick="
+        event.preventDefault();
+
+        if(openMenuDetail === '${detailId}'){
+            openMenuDetail = null;
+        }else{
+            openMenuDetail = '${detailId}';
+        }
+
+        showMenus();
+    ">
+        ${menu.image ? "詳細・写真" : "詳細"}
+    </summary>
+    ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
+    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+    ${itemsHtml}
+    </details>
+
+                <div class="menu-buttons">
+                    <button type="button" onclick="moveMenuUp(${index})">↑</button>
+                    <button type="button" onclick="moveMenuDown(${index})">↓</button>
+                    <button type="button" onclick="editMenu(${index})">編集</button>
+                    <button type="button" onclick="deleteMenu(${index})">削除</button>
+                </div>
+            `;
+
+            ul.appendChild(li);
+        });
+
+        details.appendChild(ul);
+        menuList.appendChild(details);
+    });
 }
 
-function loadMenus() {
-  menus = JSON.parse(localStorage.getItem(MENU_KEY) || "[]");
+function getItemsHtml(itemsText) {
+    if (!itemsText) return "";
 
-  renderMenuManageList();
-  renderOrderMenuList();
+    const items = itemsText
+        .split("\n")
+        .map(function(item) {
+            return item.trim();
+        })
+        .filter(function(item) {
+            return item !== "";
+        });
+
+    if (items.length === 0) return "";
+
+    let html = "内容：<br><ul>";
+
+    items.forEach(function(item) {
+        html += "<li>" + item + "</li>";
+    });
+
+    html += "</ul>";
+    return html;
 }
 
-function saveMenus() {
-  localStorage.setItem(MENU_KEY, JSON.stringify(menus));
+function handleImageSelect(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const img = new Image();
+
+        img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const maxWidth = 600;
+            const scale = Math.min(maxWidth / img.width, 1);
+
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            currentImage = canvas.toDataURL("image/jpeg", 0.7);
+
+            const preview = document.getElementById("imagePreview");
+            preview.src = currentImage;
+            preview.style.display = "block";
+        };
+
+        img.src = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
 }
 
-function addMenu() {
-  const name = document.getElementById("menuName").value.trim();
-  const price = document.getElementById("menuPrice").value;
-
-  if (!name) {
-    alert("メニュー名を入力してください。");
-    return;
-  }
-
-  if (!price) {
-    alert("金額を入力してください。");
-    return;
-  }
-
-  menus.push({
-    name: name,
-    price: Number(price)
-  });
-
-  saveMenus();
-
-  document.getElementById("menuName").value = "";
-  document.getElementById("menuPrice").value = "";
-
-  loadMenus();
+function clearImage() {
+    currentImage = "";
+    document.getElementById("menuImageFile").value = "";
+    document.getElementById("imagePreview").src = "";
+    document.getElementById("imagePreview").style.display = "none";
 }
 
-function renderMenuManageList() {
-  const list = document.getElementById("menuManageList");
-  list.innerHTML = "";
+function applyCategoryTemplate() {
+    const category = document.getElementById("menuCategory").value;
+    const description = document.getElementById("menuDescription");
+    const isMarketPrice = document.getElementById("isMarketPrice");
 
-  if (menus.length === 0) {
-    list.innerHTML = '<p class="empty">メニューがありません。</p>';
-    return;
-  }
+    const fishText = "水槽からお選びください。価格は大きさ・状態によって異なります。";
 
-  menus.forEach((menu, index) => {
-    const div = document.createElement("div");
-    div.className = "menu-item";
+    if (category === "活魚") {
+        if (description.value === "") {
+            description.value = fishText;
+        }
 
-    div.innerHTML = `
-      <div class="menu-name">${menu.name}</div>
-      <div>${menu.price}円</div>
-      <button class="small-button danger" onclick="deleteMenu(${index})">削除</button>
-    `;
+        isMarketPrice.checked = true;
+    } else {
+        if (description.value === fishText) {
+            description.value = "";
+        }
 
-    list.appendChild(div);
-  });
+        isMarketPrice.checked = false;
+    }
+}
+
+function getPriceText(menu) {
+    return menu.isMarketPrice ? "時価" : menu.price + "円";
+}
+
+function getTagsText(menu) {
+    let tags = [];
+
+    if (menu.isRecommended) tags.push("おすすめ");
+    if (menu.isShimabara) tags.push("島原名物");
+
+    return tags.join("・");
+}
+
+function editMenu(index) {
+    const menu = menus[index];
+
+    document.getElementById("menuName").value = menu.name;
+    document.getElementById("menuPrice").value = menu.price || "";
+    document.getElementById("menuCategory").value = menu.category;
+    document.getElementById("menuDescription").value = menu.description || "";
+    document.getElementById("menuItems").value = menu.itemsText || "";
+    document.getElementById("isRecommended").checked = menu.isRecommended || false;
+    document.getElementById("isShimabara").checked = menu.isShimabara || false;
+    document.getElementById("isVisible").checked = menu.isVisible !== false;
+    document.getElementById("showNormal").checked = menu.showNormal !== false;
+    document.getElementById("showBusy").checked = menu.showBusy !== false;
+    document.getElementById("isMarketPrice").checked = menu.isMarketPrice || false;
+
+    currentImage = menu.image || "";
+
+    if (currentImage) {
+        const preview = document.getElementById("imagePreview");
+        preview.src = currentImage;
+        preview.style.display = "block";
+    } else {
+        clearImage();
+    }
+
+    editIndex = index;
+    openCategory = menu.category;
+    document.getElementById("saveButton").textContent = "更新";
+    showMenus();
 }
 
 function deleteMenu(index) {
-  if (!confirm("このメニューを削除しますか？")) {
-    return;
-  }
-
-  menus.splice(index, 1);
-  saveMenus();
-  loadMenus();
+    openCategory = menus[index].category;
+    menus.splice(index, 1);
+    saveMenus();
+    showMenus();
 }
 
-function renderOrderMenuList() {
-  const list = document.getElementById("orderMenuList");
-  list.innerHTML = "";
+function moveMenuUp(index) {
+    const currentMenu = menus[index];
+    openCategory = currentMenu.category;
 
-  if (menus.length === 0) {
-    list.innerHTML = '<p class="empty">メニューが登録されていません。</p>';
-    return;
-  }
+    for (let i = index - 1; i >= 0; i--) {
+        if (menus[i].category === currentMenu.category) {
+            const temp = menus[i];
+            menus[i] = menus[index];
+            menus[index] = temp;
 
-  menus.forEach((menu, index) => {
-    const div = document.createElement("div");
-    div.className = "menu-item";
-
-    div.innerHTML = `
-      <div class="menu-name">${menu.name}</div>
-      <div>${menu.price}円</div>
-      <button onclick="addToCart(${index})">追加</button>
-    `;
-
-    list.appendChild(div);
-  });
+            saveMenus();
+            showMenus();
+            return;
+        }
+    }
 }
 
-function addToCart(index) {
-  const menu = menus[index];
+function moveMenuDown(index) {
+    const currentMenu = menus[index];
+    openCategory = currentMenu.category;
 
-  const existingItem = cart.find(item => item.name === menu.name);
+    for (let i = index + 1; i < menus.length; i++) {
+        if (menus[i].category === currentMenu.category) {
+            const temp = menus[i];
+            menus[i] = menus[index];
+            menus[index] = temp;
 
-  if (existingItem) {
-    existingItem.quantity++;
-  } else {
-    cart.push({
-      name: menu.name,
-      price: Number(menu.price),
-      quantity: 1
-    });
-  }
-
-  renderCart();
+            saveMenus();
+            showMenus();
+            return;
+        }
+    }
 }
 
-function renderCart() {
-  const cartList = document.getElementById("cartList");
-  const totalPrice = document.getElementById("totalPrice");
-
-  cartList.innerHTML = "";
-
-  if (cart.length === 0) {
-    cartList.innerHTML = '<p class="empty">まだ注文がありません。</p>';
-    totalPrice.textContent = "0";
-    return;
-  }
-
-  let total = 0;
-
-  cart.forEach((item, index) => {
-    total += item.price * item.quantity;
-
-    const div = document.createElement("div");
-    div.className = "cart-item";
-
-    div.innerHTML = `
-      <strong>${item.name}</strong><br>
-      ${item.price}円 × ${item.quantity}個
-      ＝ ${item.price * item.quantity}円<br>
-
-      <button class="small-button" onclick="decreaseItem(${index})">−</button>
-      <button class="small-button" onclick="increaseItem(${index})">＋</button>
-      <button class="small-button danger" onclick="removeItem(${index})">削除</button>
-    `;
-
-    cartList.appendChild(div);
-  });
-
-  totalPrice.textContent = total;
+function clearForm() {
+    document.getElementById("menuName").value = "";
+    document.getElementById("menuPrice").value = "";
+    document.getElementById("menuDescription").value = "";
+    document.getElementById("menuItems").value = "";
+    document.getElementById("isRecommended").checked = false;
+    document.getElementById("isShimabara").checked = false;
+    document.getElementById("isVisible").checked = true;
+    document.getElementById("showNormal").checked = true;
+    document.getElementById("showBusy").checked = true;
+    document.getElementById("isMarketPrice").checked = false;
+    clearImage();
 }
 
-function increaseItem(index) {
-  cart[index].quantity++;
-  renderCart();
+function saveMenus() {
+    localStorage.setItem("orderSystemMenus", JSON.stringify(menus));
 }
 
-function decreaseItem(index) {
-  cart[index].quantity--;
+function loadMenus() {
+    const savedMenus = localStorage.getItem("orderSystemMenus");
 
-  if (cart[index].quantity <= 0) {
-    cart.splice(index, 1);
-  }
+    if (savedMenus) {
+        menus = JSON.parse(savedMenus);
+    }
 
-  renderCart();
+    showMenus();
 }
 
-function removeItem(index) {
-  cart.splice(index, 1);
-  renderCart();
-}
-
-function submitOrder() {
-  const tableNumber = document.getElementById("tableNumber").value;
-
-  if (!tableNumber) {
-    alert("席番号を選択してください。");
-    return;
-  }
-
-  if (cart.length === 0) {
-    alert("注文内容がありません。");
-    return;
-  }
-
-  const orders = JSON.parse(localStorage.getItem(ORDER_KEY) || "[]");
-
-  const order = {
-    id: Date.now(),
-    table: tableNumber,
-    items: cart,
-    status: "未対応",
-    paid: false,
-    createdAt: new Date().toLocaleString()
-  };
-
-  orders.push(order);
-  localStorage.setItem(ORDER_KEY, JSON.stringify(orders));
-
-  alert(tableNumber + "席の注文を送信しました。");
-
-  cart = [];
-  renderCart();
-}
-
-createTableOptions();
 loadMenus();
-renderCart();
 </script>
 
 </body>
