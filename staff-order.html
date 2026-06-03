@@ -2,34 +2,47 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>スタッフ注文画面</title>
+<title>飲食店注文システム</title>
 
 <style>
 body {
   font-family: sans-serif;
   background: #f5f5f5;
   margin: 0;
-  padding: 16px;
+  padding: 12px;
 }
 
 h1 {
   text-align: center;
+  font-size: 24px;
+}
+
+nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+nav button {
+  flex: 1;
+  background: #555;
 }
 
 section {
   background: white;
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
   border-radius: 10px;
 }
 
-select, button {
+input, select, textarea, button {
   font-size: 16px;
   padding: 8px;
   margin-top: 6px;
+  box-sizing: border-box;
 }
 
-select {
+input, select, textarea {
   width: 100%;
 }
 
@@ -40,9 +53,17 @@ button {
   color: white;
 }
 
-.menu-item {
+.danger {
+  background: #c0392b;
+}
+
+.orange {
+  background: #d35400;
+}
+
+.menu-item, .cart-item {
   border-bottom: 1px solid #ddd;
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
 .menu-name {
@@ -50,25 +71,9 @@ button {
   font-size: 18px;
 }
 
-.menu-price {
-  color: #555;
-}
-
-.cart-item {
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0;
-}
-
 .small-button {
-  margin-left: 4px;
-  padding: 4px 8px;
-}
-
-#submitButton {
-  width: 100%;
-  background: #d35400;
-  font-size: 18px;
-  padding: 12px;
+  padding: 5px 8px;
+  margin-right: 4px;
 }
 
 .empty {
@@ -80,26 +85,53 @@ button {
 
 <body>
 
-<h1>スタッフ注文画面</h1>
+<h1>飲食店注文システム</h1>
 
-<section>
-  <h2>席番号</h2>
-  <select id="tableNumber">
-    <option value="">席を選択してください</option>
-  </select>
-</section>
+<nav>
+  <button onclick="showTab('menuTab')">メニュー管理</button>
+  <button onclick="showTab('orderTab')">スタッフ注文</button>
+</nav>
 
-<section>
-  <h2>メニュー</h2>
-  <div id="menuList"></div>
-</section>
+<div id="menuTab">
 
-<section>
-  <h2>注文内容</h2>
-  <div id="cartList"></div>
-  <p>合計：<span id="totalPrice">0</span>円</p>
-  <button id="submitButton" onclick="submitOrder()">注文送信</button>
-</section>
+  <section>
+    <h2>メニュー追加</h2>
+
+    <input type="text" id="menuName" placeholder="メニュー名">
+    <input type="number" id="menuPrice" placeholder="金額">
+
+    <button onclick="addMenu()">追加</button>
+  </section>
+
+  <section>
+    <h2>登録済みメニュー</h2>
+    <div id="menuManageList"></div>
+  </section>
+
+</div>
+
+<div id="orderTab" style="display:none;">
+
+  <section>
+    <h2>席番号</h2>
+    <select id="tableNumber">
+      <option value="">席を選択してください</option>
+    </select>
+  </section>
+
+  <section>
+    <h2>メニュー</h2>
+    <div id="orderMenuList"></div>
+  </section>
+
+  <section>
+    <h2>注文内容</h2>
+    <div id="cartList"></div>
+    <p>合計：<span id="totalPrice">0</span>円</p>
+    <button class="orange" onclick="submitOrder()">注文送信</button>
+  </section>
+
+</div>
 
 <script>
 const MENU_KEY = "orderSystemMenus";
@@ -116,6 +148,16 @@ const TABLES = [
 let menus = [];
 let cart = [];
 
+function showTab(tabId) {
+  document.getElementById("menuTab").style.display = "none";
+  document.getElementById("orderTab").style.display = "none";
+
+  document.getElementById(tabId).style.display = "block";
+
+  loadMenus();
+  renderCart();
+}
+
 function createTableOptions() {
   const select = document.getElementById("tableNumber");
 
@@ -129,15 +171,48 @@ function createTableOptions() {
 
 function loadMenus() {
   menus = JSON.parse(localStorage.getItem(MENU_KEY) || "[]");
-  renderMenus();
+
+  renderMenuManageList();
+  renderOrderMenuList();
 }
 
-function renderMenus() {
-  const menuList = document.getElementById("menuList");
-  menuList.innerHTML = "";
+function saveMenus() {
+  localStorage.setItem(MENU_KEY, JSON.stringify(menus));
+}
+
+function addMenu() {
+  const name = document.getElementById("menuName").value.trim();
+  const price = document.getElementById("menuPrice").value;
+
+  if (!name) {
+    alert("メニュー名を入力してください。");
+    return;
+  }
+
+  if (!price) {
+    alert("金額を入力してください。");
+    return;
+  }
+
+  menus.push({
+    name: name,
+    price: Number(price)
+  });
+
+  saveMenus();
+
+  document.getElementById("menuName").value = "";
+  document.getElementById("menuPrice").value = "";
+
+  loadMenus();
+}
+
+function renderMenuManageList() {
+  const list = document.getElementById("menuManageList");
+  list.innerHTML = "";
 
   if (menus.length === 0) {
-    menuList.innerHTML = '<p class="empty">メニューが登録されていません。</p>';
+    list.innerHTML = '<p class="empty">メニューがありません。</p>';
     return;
   }
 
@@ -147,11 +222,44 @@ function renderMenus() {
 
     div.innerHTML = `
       <div class="menu-name">${menu.name}</div>
-      <div class="menu-price">${menu.price}円</div>
+      <div>${menu.price}円</div>
+      <button class="small-button danger" onclick="deleteMenu(${index})">削除</button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+function deleteMenu(index) {
+  if (!confirm("このメニューを削除しますか？")) {
+    return;
+  }
+
+  menus.splice(index, 1);
+  saveMenus();
+  loadMenus();
+}
+
+function renderOrderMenuList() {
+  const list = document.getElementById("orderMenuList");
+  list.innerHTML = "";
+
+  if (menus.length === 0) {
+    list.innerHTML = '<p class="empty">メニューが登録されていません。</p>';
+    return;
+  }
+
+  menus.forEach((menu, index) => {
+    const div = document.createElement("div");
+    div.className = "menu-item";
+
+    div.innerHTML = `
+      <div class="menu-name">${menu.name}</div>
+      <div>${menu.price}円</div>
       <button onclick="addToCart(${index})">追加</button>
     `;
 
-    menuList.appendChild(div);
+    list.appendChild(div);
   });
 }
 
@@ -200,7 +308,7 @@ function renderCart() {
 
       <button class="small-button" onclick="decreaseItem(${index})">−</button>
       <button class="small-button" onclick="increaseItem(${index})">＋</button>
-      <button class="small-button" onclick="removeItem(${index})">削除</button>
+      <button class="small-button danger" onclick="removeItem(${index})">削除</button>
     `;
 
     cartList.appendChild(div);
@@ -254,7 +362,6 @@ function submitOrder() {
   };
 
   orders.push(order);
-
   localStorage.setItem(ORDER_KEY, JSON.stringify(orders));
 
   alert(tableNumber + "席の注文を送信しました。");
