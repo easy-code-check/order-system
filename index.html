@@ -32,78 +32,77 @@
     <ul id="menuList"></ul>
 
     <script>
-    let menus = [];
+        let menus = [];
 
-    loadMenus();
+        function addMenu() {
+            const name = document.getElementById("menuName").value;
+            const price = document.getElementById("menuPrice").value;
+            const category = document.getElementById("menuCategory").value;
+            const description = document.getElementById("menuDescription").value;
 
-    function addMenu() {
-        const name = document.getElementById("menuName").value;
-        const price = document.getElementById("menuPrice").value;
-        const category = document.getElementById("menuCategory").value;
-        const description = document.getElementById("menuDescription").value;
+            if (name === "" || price === "") {
+                alert("メニュー名と価格を入力してください");
+                return;
+            }
 
-        if (name === "" || price === "") {
-            alert("メニュー名と価格を入力してください");
-            return;
+            const menu = {
+                name: name,
+                price: price,
+                category: category,
+                description: description
+            };
+
+            menus.push(menu);
+            saveMenus();
+            showMenus();
+
+            document.getElementById("menuName").value = "";
+            document.getElementById("menuPrice").value = "";
+            document.getElementById("menuDescription").value = "";
         }
 
-        const menu = {
-            name: name,
-            price: price,
-            category: category,
-            description: description
-        };
+        function showMenus() {
+            const menuList = document.getElementById("menuList");
+            menuList.innerHTML = "";
 
-        menus.push(menu);
+            menus.forEach(function(menu, index) {
+                const li = document.createElement("li");
 
-        saveMenus();
-        showMenus();
+                li.innerHTML = `
+                    <strong>${menu.name}</strong>：${menu.price}円
+                    <br>
+                    カテゴリ：${menu.category}
+                    <br>
+                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                    <button onclick="deleteMenu(${index})">削除</button>
+                `;
 
-        document.getElementById("menuName").value = "";
-        document.getElementById("menuPrice").value = "";
-        document.getElementById("menuDescription").value = "";
-    }
-
-    function showMenus() {
-        const menuList = document.getElementById("menuList");
-        menuList.innerHTML = "";
-
-        menus.forEach(function(menu, index) {
-            const li = document.createElement("li");
-
-            li.innerHTML = `
-                <strong>${menu.name}</strong>：${menu.price}円
-                <br>
-                カテゴリ：${menu.category}
-                <br>
-                ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-                <button onclick="deleteMenu(${index})">削除</button>
-            `;
-
-            menuList.appendChild(li);
-        });
-    }
-
-    function deleteMenu(index) {
-        menus.splice(index, 1);
-        saveMenus();
-        showMenus();
-    }
-
-    function saveMenus() {
-        localStorage.setItem("orderSystemMenus", JSON.stringify(menus));
-    }
-
-    function loadMenus() {
-        const savedMenus = localStorage.getItem("orderSystemMenus");
-
-        if (savedMenus) {
-            menus = JSON.parse(savedMenus);
+                menuList.appendChild(li);
+            });
         }
 
-        showMenus();
-    }
-</script>
+        function deleteMenu(index) {
+            menus.splice(index, 1);
+            saveMenus();
+            showMenus();
+        }
+
+        function saveMenus() {
+            localStorage.setItem("orderSystemMenus", JSON.stringify(menus));
+        }
+
+        function loadMenus() {
+            const savedMenus = localStorage.getItem("orderSystemMenus");
+
+            if (savedMenus) {
+                menus = JSON.parse(savedMenus);
+            }
+
+            showMenus();
+        }
+
+        loadMenus();
+    </script>
 
 </body>
 </html>
