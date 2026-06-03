@@ -8,11 +8,45 @@
 
     <h1>メニュー管理</h1>
 
-    <input type="text" placeholder="メニュー名">
+    <input id="menuName" type="text" placeholder="メニュー名">
+    <input id="menuPrice" type="number" placeholder="価格">
 
-    <input type="number" placeholder="価格">
+    <button onclick="addMenu()">追加</button>
 
-    <button>追加</button>
+    <h2>メニュー一覧</h2>
+    <ul id="menuList"></ul>
+
+    <script>
+        let menus = [];
+
+        function addMenu() {
+            const name = document.getElementById("menuName").value;
+            const price = document.getElementById("menuPrice").value;
+
+            const menu = {
+                name: name,
+                price: price
+            };
+
+            menus.push(menu);
+
+            showMenus();
+
+            document.getElementById("menuName").value = "";
+            document.getElementById("menuPrice").value = "";
+        }
+
+        function showMenus() {
+            const menuList = document.getElementById("menuList");
+            menuList.innerHTML = "";
+
+            menus.forEach(function(menu) {
+                const li = document.createElement("li");
+                li.textContent = menu.name + "：" + menu.price + "円";
+                menuList.appendChild(li);
+            });
+        }
+    </script>
 
 </body>
 </html>
