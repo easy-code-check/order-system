@@ -228,24 +228,29 @@
                     const li = document.createElement("li");
 
                     li.innerHTML = `
-                        <strong>${menu.name}</strong>：${getPriceText(menu)}
-                        <br>
-                        状態：${visibleText} / ${normalText} / ${busyText}
-                        <br>
-                        ${tags ? "タグ：" + tags + "<br>" : ""}
-                        ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-                        ${itemsHtml}
-                        ${menu.image ? "写真：" + menu.image + "<br>" : ""}
-                        <div class="menu-buttons">
-                            <button type="button" onclick="moveMenuUp(${index})">↑</button>
-                            <button type="button" onclick="moveMenuDown(${index})">↓</button>
-                            <button type="button" onclick="editMenu(${index})">編集</button>
-                            <button type="button" onclick="deleteMenu(${index})">削除</button>
-                        </div>
-                    `;
+    <strong>${menu.name}</strong>：${getPriceText(menu)}
+    <br>
+    状態：${visibleText} / ${normalText} / ${busyText}
+    <br>
+    ${tags ? "タグ：" + tags + "<br>" : ""}
 
-                    ul.appendChild(li);
-                });
+    <details>
+        <summary>詳細・写真</summary>
+
+        ${menu.image ? `<img src="${menu.image}" style="width:100%; max-width:300px; border-radius:10px; margin-top:10px;"><br>` : ""}
+
+        ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+
+        ${itemsHtml}
+    </details>
+
+    <div class="menu-buttons">
+        <button type="button" onclick="moveMenuUp(${index})">↑</button>
+        <button type="button" onclick="moveMenuDown(${index})">↓</button>
+        <button type="button" onclick="editMenu(${index})">編集</button>
+        <button type="button" onclick="deleteMenu(${index})">削除</button>
+    </div>
+`;
 
                 details.appendChild(ul);
                 menuList.appendChild(details);
