@@ -3,6 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <title>order-system</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 16px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        section {
+            background: white;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+        }
+
+        input, select, textarea, button {
+            font-size: 16px;
+            padding: 8px;
+            margin-top: 6px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+        }
+
+        textarea {
+            height: 80px;
+        }
+
+        button {
+            border: none;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+            margin: 4px;
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            background: #007bff;
+        }
+
+        details {
+            background: white;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        summary {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        li {
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .menu-buttons button {
+            background: #555;
+        }
+    </style>
 </head>
 <body>
 
@@ -12,14 +86,12 @@
         <h2>基本情報</h2>
 
         <label>メニュー名</label>
-        <br>
         <input id="menuName" type="text" placeholder="例：ガンバずし定食">
+
         <br><br>
 
         <label>価格</label>
-        <br>
         <input id="menuPrice" type="number" placeholder="例：1500">
-        <br>
 
         <label>
             <input id="isMarketPrice" type="checkbox">
@@ -29,7 +101,6 @@
         <br><br>
 
         <label>カテゴリ</label>
-        <br>
         <select id="menuCategory" onchange="applyCategoryTemplate()">
             <option value="定食">定食</option>
             <option value="丼・麺">丼・麺</option>
@@ -48,7 +119,6 @@
         <br><br>
 
         <label>説明文</label>
-        <br>
         <textarea id="menuDescription" placeholder="セット内容・注意書きなど"></textarea>
     </section>
 
@@ -93,13 +163,10 @@
 
     <section>
         <h2>写真設定（準備中）</h2>
-
         <input id="menuImage" type="text" placeholder="写真URL（今は空欄でOK）">
     </section>
 
-    <br>
-
-    <button id="saveButton" onclick="saveMenu()">追加</button>
+    <button id="saveButton" class="save-button" onclick="saveMenu()">追加</button>
 
     <h2>メニュー一覧</h2>
 
@@ -239,10 +306,12 @@
                         ${tags ? "タグ：" + tags + "<br>" : ""}
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
                         ${menu.image ? "写真：" + menu.image + "<br>" : ""}
-                        <button onclick="moveMenuUp(${index})">↑</button>
-                        <button onclick="moveMenuDown(${index})">↓</button>
-                        <button onclick="editMenu(${index})">編集</button>
-                        <button onclick="deleteMenu(${index})">削除</button>
+                        <div class="menu-buttons">
+                            <button onclick="moveMenuUp(${index})">↑</button>
+                            <button onclick="moveMenuDown(${index})">↓</button>
+                            <button onclick="editMenu(${index})">編集</button>
+                            <button onclick="deleteMenu(${index})">削除</button>
+                        </div>
                     `;
 
                     ul.appendChild(li);
@@ -254,26 +323,26 @@
         }
 
         function applyCategoryTemplate() {
-    const category = document.getElementById("menuCategory").value;
-    const description = document.getElementById("menuDescription");
-    const isMarketPrice = document.getElementById("isMarketPrice");
+            const category = document.getElementById("menuCategory").value;
+            const description = document.getElementById("menuDescription");
+            const isMarketPrice = document.getElementById("isMarketPrice");
 
-    const fishText = "水槽からお選びください。価格は大きさ・状態によって異なります。";
+            const fishText = "水槽からお選びください。価格は大きさ・状態によって異なります。";
 
-    if (category === "活魚") {
-        if (description.value === "") {
-            description.value = fishText;
+            if (category === "活魚") {
+                if (description.value === "") {
+                    description.value = fishText;
+                }
+
+                isMarketPrice.checked = true;
+            } else {
+                if (description.value === fishText) {
+                    description.value = "";
+                }
+
+                isMarketPrice.checked = false;
+            }
         }
-
-        isMarketPrice.checked = true;
-    } else {
-        if (description.value === fishText) {
-            description.value = "";
-        }
-
-        isMarketPrice.checked = false;
-    }
-}
 
         function getPriceText(menu) {
             if (menu.isMarketPrice) {
@@ -321,31 +390,38 @@
             saveMenus();
             showMenus();
         }
+
         function moveMenuUp(index) {
-    if (index === 0) {
-        return;
-    }
+            const currentMenu = menus[index];
 
-    const temp = menus[index - 1];
-    menus[index - 1] = menus[index];
-    menus[index] = temp;
+            for (let i = index - 1; i >= 0; i--) {
+                if (menus[i].category === currentMenu.category) {
+                    const temp = menus[i];
+                    menus[i] = menus[index];
+                    menus[index] = temp;
 
-    saveMenus();
-    showMenus();
-}
+                    saveMenus();
+                    showMenus();
+                    return;
+                }
+            }
+        }
 
-function moveMenuDown(index) {
-    if (index === menus.length - 1) {
-        return;
-    }
+        function moveMenuDown(index) {
+            const currentMenu = menus[index];
 
-    const temp = menus[index + 1];
-    menus[index + 1] = menus[index];
-    menus[index] = temp;
+            for (let i = index + 1; i < menus.length; i++) {
+                if (menus[i].category === currentMenu.category) {
+                    const temp = menus[i];
+                    menus[i] = menus[index];
+                    menus[index] = temp;
 
-    saveMenus();
-    showMenus();
-}
+                    saveMenus();
+                    showMenus();
+                    return;
+                }
+            }
+        }
 
         function clearForm() {
             document.getElementById("menuName").value = "";
