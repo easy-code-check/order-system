@@ -252,14 +252,26 @@
         }
 
         function applyCategoryTemplate() {
-            const category = document.getElementById("menuCategory").value;
-            const description = document.getElementById("menuDescription");
+    const category = document.getElementById("menuCategory").value;
+    const description = document.getElementById("menuDescription");
+    const isMarketPrice = document.getElementById("isMarketPrice");
 
-            if (category === "活魚" && description.value === "") {
-                description.value = "水槽からお選びください。価格は大きさ・状態によって異なります。";
-                document.getElementById("isMarketPrice").checked = true;
-            }
+    const fishText = "水槽からお選びください。価格は大きさ・状態によって異なります。";
+
+    if (category === "活魚") {
+        if (description.value === "") {
+            description.value = fishText;
         }
+
+        isMarketPrice.checked = true;
+    } else {
+        if (description.value === fishText) {
+            description.value = "";
+        }
+
+        isMarketPrice.checked = false;
+    }
+}
 
         function getPriceText(menu) {
             if (menu.isMarketPrice) {
