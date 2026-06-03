@@ -239,6 +239,8 @@
                         ${tags ? "タグ：" + tags + "<br>" : ""}
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
                         ${menu.image ? "写真：" + menu.image + "<br>" : ""}
+                        <button onclick="moveMenuUp(${index})">↑</button>
+                        <button onclick="moveMenuDown(${index})">↓</button>
                         <button onclick="editMenu(${index})">編集</button>
                         <button onclick="deleteMenu(${index})">削除</button>
                     `;
@@ -319,6 +321,31 @@
             saveMenus();
             showMenus();
         }
+        function moveMenuUp(index) {
+    if (index === 0) {
+        return;
+    }
+
+    const temp = menus[index - 1];
+    menus[index - 1] = menus[index];
+    menus[index] = temp;
+
+    saveMenus();
+    showMenus();
+}
+
+function moveMenuDown(index) {
+    if (index === menus.length - 1) {
+        return;
+    }
+
+    const temp = menus[index + 1];
+    menus[index + 1] = menus[index];
+    menus[index] = temp;
+
+    saveMenus();
+    showMenus();
+}
 
         function clearForm() {
             document.getElementById("menuName").value = "";
