@@ -5,71 +5,18 @@
     <title>order-system</title>
 
     <style>
-        body {
-            font-family: sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 16px;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        section, details {
-            background: white;
-            padding: 16px;
-            margin-bottom: 16px;
-            border-radius: 10px;
-        }
-
-        input, select, textarea, button {
-            font-size: 16px;
-            padding: 8px;
-            margin-top: 6px;
-            box-sizing: border-box;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-        }
-
-        textarea {
-            height: 80px;
-        }
-
-        button {
-            border: none;
-            border-radius: 6px;
-            background: #333;
-            color: white;
-            margin: 4px;
-        }
-
-        .save-button {
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            background: #007bff;
-        }
-
-        summary {
-            font-weight: bold;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        li {
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
-
-        .menu-buttons button {
-            background: #555;
-        }
+        body { font-family: sans-serif; background: #f5f5f5; margin: 0; padding: 16px; }
+        h1 { text-align: center; }
+        section, details { background: white; padding: 16px; margin-bottom: 16px; border-radius: 10px; }
+        input, select, textarea, button { font-size: 16px; padding: 8px; margin-top: 6px; box-sizing: border-box; }
+        input[type="text"], input[type="number"], select, textarea { width: 100%; }
+        textarea { height: 80px; }
+        #menuItems { height: 120px; }
+        button { border: none; border-radius: 6px; background: #333; color: white; margin: 4px; }
+        .save-button { width: 100%; padding: 12px; font-size: 18px; background: #007bff; }
+        summary { font-weight: bold; font-size: 18px; cursor: pointer; }
+        li { margin-bottom: 16px; line-height: 1.6; }
+        .menu-buttons button { background: #555; }
     </style>
 </head>
 <body>
@@ -113,46 +60,33 @@
         <br><br>
 
         <label>説明文</label>
-        <textarea id="menuDescription" placeholder="セット内容・注意書きなど"></textarea>
+        <textarea id="menuDescription" placeholder="例：島原名物を楽しめる人気セットです"></textarea>
+
+        <br><br>
+
+        <label>内容（1行ずつ入力）</label>
+        <textarea id="menuItems" placeholder="例：
+具雑煮
+ガンバずし
+かんざらし"></textarea>
     </section>
 
     <section>
         <h2>タグ</h2>
 
-        <label>
-            <input id="isRecommended" type="checkbox">
-            おすすめ
-        </label>
-
+        <label><input id="isRecommended" type="checkbox"> おすすめ</label>
         <br>
-
-        <label>
-            <input id="isShimabara" type="checkbox">
-            島原名物
-        </label>
+        <label><input id="isShimabara" type="checkbox"> 島原名物</label>
     </section>
 
     <section>
         <h2>表示設定</h2>
 
-        <label>
-            <input id="isVisible" type="checkbox" checked>
-            お客さんに表示する
-        </label>
-
+        <label><input id="isVisible" type="checkbox" checked> お客さんに表示する</label>
         <br>
-
-        <label>
-            <input id="showNormal" type="checkbox" checked>
-            通常営業で表示
-        </label>
-
+        <label><input id="showNormal" type="checkbox" checked> 通常営業で表示</label>
         <br>
-
-        <label>
-            <input id="showBusy" type="checkbox" checked>
-            忙しい日も表示
-        </label>
+        <label><input id="showBusy" type="checkbox" checked> 忙しい日も表示</label>
     </section>
 
     <section>
@@ -174,18 +108,8 @@
         let openCategory = null;
 
         const categories = [
-            "定食",
-            "丼・麺",
-            "一品料理",
-            "活魚",
-            "焼鳥",
-            "刺身",
-            "焼魚",
-            "ご飯",
-            "サラダ",
-            "デザート",
-            "飲み物",
-            "その他"
+            "定食", "丼・麺", "一品料理", "活魚", "焼鳥", "刺身",
+            "焼魚", "ご飯", "サラダ", "デザート", "飲み物", "その他"
         ];
 
         function saveMenu() {
@@ -193,6 +117,7 @@
             const price = document.getElementById("menuPrice").value;
             const category = document.getElementById("menuCategory").value;
             const description = document.getElementById("menuDescription").value;
+            const itemsText = document.getElementById("menuItems").value;
             const isRecommended = document.getElementById("isRecommended").checked;
             const isShimabara = document.getElementById("isShimabara").checked;
             const isVisible = document.getElementById("isVisible").checked;
@@ -216,6 +141,7 @@
                 price,
                 category,
                 description,
+                itemsText,
                 isRecommended,
                 isShimabara,
                 isVisible,
@@ -262,6 +188,7 @@
                             (
                                 menu.name.includes(searchText) ||
                                 (menu.description || "").includes(searchText) ||
+                                (menu.itemsText || "").includes(searchText) ||
                                 menu.category.includes(searchText) ||
                                 tags.includes(searchText) ||
                                 visibleText.includes(searchText) ||
@@ -271,9 +198,7 @@
                             );
                     });
 
-                if (categoryMenus.length === 0) {
-                    return;
-                }
+                if (categoryMenus.length === 0) return;
 
                 const details = document.createElement("details");
                 details.open = searchText !== "" || openCategory === category;
@@ -283,13 +208,7 @@
 
                 summary.addEventListener("click", function(event) {
                     event.preventDefault();
-
-                    if (openCategory === category) {
-                        openCategory = null;
-                    } else {
-                        openCategory = category;
-                    }
-
+                    openCategory = openCategory === category ? null : category;
                     showMenus();
                 });
 
@@ -304,6 +223,7 @@
                     const visibleText = menu.isVisible === false ? "非表示" : "表示中";
                     const normalText = menu.showNormal === false ? "通常なし" : "通常";
                     const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
+                    const itemsHtml = getItemsHtml(menu.itemsText);
 
                     const li = document.createElement("li");
 
@@ -314,6 +234,7 @@
                         <br>
                         ${tags ? "タグ：" + tags + "<br>" : ""}
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                        ${itemsHtml}
                         ${menu.image ? "写真：" + menu.image + "<br>" : ""}
                         <div class="menu-buttons">
                             <button type="button" onclick="moveMenuUp(${index})">↑</button>
@@ -329,6 +250,31 @@
                 details.appendChild(ul);
                 menuList.appendChild(details);
             });
+        }
+
+        function getItemsHtml(itemsText) {
+            if (!itemsText) return "";
+
+            const items = itemsText
+                .split("\n")
+                .map(function(item) {
+                    return item.trim();
+                })
+                .filter(function(item) {
+                    return item !== "";
+                });
+
+            if (items.length === 0) return "";
+
+            let html = "内容：<br><ul>";
+
+            items.forEach(function(item) {
+                html += "<li>・" + item + "</li>";
+            });
+
+            html += "</ul>";
+
+            return html;
         }
 
         function applyCategoryTemplate() {
@@ -360,13 +306,8 @@
         function getTagsText(menu) {
             let tags = [];
 
-            if (menu.isRecommended) {
-                tags.push("おすすめ");
-            }
-
-            if (menu.isShimabara) {
-                tags.push("島原名物");
-            }
+            if (menu.isRecommended) tags.push("おすすめ");
+            if (menu.isShimabara) tags.push("島原名物");
 
             return tags.join("・");
         }
@@ -378,6 +319,7 @@
             document.getElementById("menuPrice").value = menu.price || "";
             document.getElementById("menuCategory").value = menu.category;
             document.getElementById("menuDescription").value = menu.description || "";
+            document.getElementById("menuItems").value = menu.itemsText || "";
             document.getElementById("isRecommended").checked = menu.isRecommended || false;
             document.getElementById("isShimabara").checked = menu.isShimabara || false;
             document.getElementById("isVisible").checked = menu.isVisible !== false;
@@ -437,6 +379,7 @@
             document.getElementById("menuName").value = "";
             document.getElementById("menuPrice").value = "";
             document.getElementById("menuDescription").value = "";
+            document.getElementById("menuItems").value = "";
             document.getElementById("menuImage").value = "";
             document.getElementById("isRecommended").checked = false;
             document.getElementById("isShimabara").checked = false;
