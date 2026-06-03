@@ -1,416 +1,472 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>order-system</title>
+<meta charset="UTF-8">
+<title>order-system</title>
 
-    <style>
-        body { font-family: sans-serif; background: #f5f5f5; margin: 0; padding: 16px; }
-        h1 { text-align: center; }
-        section, details { background: white; padding: 16px; margin-bottom: 16px; border-radius: 10px; }
-        input, select, textarea, button { font-size: 16px; padding: 8px; margin-top: 6px; box-sizing: border-box; }
-        input[type="text"], input[type="number"], select, textarea { width: 100%; }
-        textarea { height: 80px; }
-        #menuItems { height: 120px; }
-        button { border: none; border-radius: 6px; background: #333; color: white; margin: 4px; }
-        .save-button { width: 100%; padding: 12px; font-size: 18px; background: #007bff; }
-        summary { font-weight: bold; font-size: 18px; cursor: pointer; }
-        li { margin-bottom: 16px; line-height: 1.6; }
-        .menu-buttons button { background: #555; }
-    </style>
+<style>
+body { font-family: sans-serif; background: #f5f5f5; margin: 0; padding: 16px; }
+h1 { text-align: center; }
+section, details { background: white; padding: 16px; margin-bottom: 16px; border-radius: 10px; }
+input, select, textarea, button { font-size: 16px; padding: 8px; margin-top: 6px; box-sizing: border-box; }
+input[type="text"], input[type="number"], select, textarea { width: 100%; }
+textarea { height: 80px; }
+#menuItems { height: 120px; }
+button { border: none; border-radius: 6px; background: #333; color: white; margin: 4px; }
+.save-button { width: 100%; padding: 12px; font-size: 18px; background: #007bff; }
+summary { font-weight: bold; font-size: 18px; cursor: pointer; }
+li { margin-bottom: 16px; line-height: 1.6; }
+.menu-buttons button { background: #555; }
+.menu-photo { width: 100%; max-width: 300px; border-radius: 10px; margin-top: 10px; }
+#imagePreview { width: 100%; max-width: 300px; border-radius: 10px; margin-top: 10px; display: none; }
+</style>
 </head>
+
 <body>
 
-    <h1>メニュー管理</h1>
+<h1>メニュー管理</h1>
 
-    <section>
-        <h2>基本情報</h2>
+<section>
+<h2>基本情報</h2>
 
-        <label>メニュー名</label>
-        <input id="menuName" type="text" placeholder="例：ガンバずし定食">
+<label>メニュー名</label>
+<input id="menuName" type="text" placeholder="例：ガンバずし定食">
 
-        <br><br>
+<br><br>
 
-        <label>価格</label>
-        <input id="menuPrice" type="number" placeholder="例：1500">
+<label>価格</label>
+<input id="menuPrice" type="number" placeholder="例：1500">
 
-        <label>
-            <input id="isMarketPrice" type="checkbox">
-            時価
-        </label>
+<label>
+<input id="isMarketPrice" type="checkbox">
+時価
+</label>
 
-        <br><br>
+<br><br>
 
-        <label>カテゴリ</label>
-        <select id="menuCategory" onchange="applyCategoryTemplate()">
-            <option value="定食">定食</option>
-            <option value="丼・麺">丼・麺</option>
-            <option value="一品料理">一品料理</option>
-            <option value="活魚">活魚</option>
-            <option value="焼鳥">焼鳥</option>
-            <option value="刺身">刺身</option>
-            <option value="焼魚">焼魚</option>
-            <option value="ご飯">ご飯</option>
-            <option value="サラダ">サラダ</option>
-            <option value="デザート">デザート</option>
-            <option value="飲み物">飲み物</option>
-            <option value="その他">その他</option>
-        </select>
+<label>カテゴリ</label>
+<select id="menuCategory" onchange="applyCategoryTemplate()">
+<option value="定食">定食</option>
+<option value="丼・麺">丼・麺</option>
+<option value="一品料理">一品料理</option>
+<option value="活魚">活魚</option>
+<option value="焼鳥">焼鳥</option>
+<option value="刺身">刺身</option>
+<option value="焼魚">焼魚</option>
+<option value="ご飯">ご飯</option>
+<option value="サラダ">サラダ</option>
+<option value="デザート">デザート</option>
+<option value="飲み物">飲み物</option>
+<option value="その他">その他</option>
+</select>
 
-        <br><br>
+<br><br>
 
-        <label>説明文</label>
-        <textarea id="menuDescription" placeholder="例：島原名物を楽しめる人気セットです"></textarea>
+<label>説明文</label>
+<textarea id="menuDescription" placeholder="例：島原名物を楽しめる人気セットです"></textarea>
 
-        <br><br>
+<br><br>
 
-        <label>内容（1行ずつ入力）</label>
-        <textarea id="menuItems" placeholder="例：
+<label>内容（1行ずつ入力）</label>
+<textarea id="menuItems" placeholder="例：
 具雑煮
 ガンバずし
 かんざらし"></textarea>
-    </section>
+</section>
 
-    <section>
-        <h2>タグ</h2>
+<section>
+<h2>タグ</h2>
+<label><input id="isRecommended" type="checkbox"> おすすめ</label>
+<br>
+<label><input id="isShimabara" type="checkbox"> 島原名物</label>
+</section>
 
-        <label><input id="isRecommended" type="checkbox"> おすすめ</label>
-        <br>
-        <label><input id="isShimabara" type="checkbox"> 島原名物</label>
-    </section>
+<section>
+<h2>表示設定</h2>
+<label><input id="isVisible" type="checkbox" checked> お客さんに表示する</label>
+<br>
+<label><input id="showNormal" type="checkbox" checked> 通常営業で表示</label>
+<br>
+<label><input id="showBusy" type="checkbox" checked> 忙しい日も表示</label>
+</section>
 
-    <section>
-        <h2>表示設定</h2>
+<section>
+<h2>写真設定</h2>
+<input id="menuImageFile" type="file" accept="image/*" onchange="handleImageSelect(event)">
+<br>
+<img id="imagePreview">
+<br>
+<button type="button" onclick="clearImage()">写真を削除</button>
+</section>
 
-        <label><input id="isVisible" type="checkbox" checked> お客さんに表示する</label>
-        <br>
-        <label><input id="showNormal" type="checkbox" checked> 通常営業で表示</label>
-        <br>
-        <label><input id="showBusy" type="checkbox" checked> 忙しい日も表示</label>
-    </section>
+<button id="saveButton" class="save-button" onclick="saveMenu()">追加</button>
 
-    <section>
-        <h2>写真設定（準備中）</h2>
-        <input id="menuImage" type="text" placeholder="写真URL（今は空欄でOK）">
-    </section>
+<h2>メニュー一覧</h2>
+<input id="searchText" type="text" placeholder="メニュー検索" oninput="showMenus()">
+<div id="menuList"></div>
 
-    <button id="saveButton" class="save-button" onclick="saveMenu()">追加</button>
+<script>
+let menus = [];
+let editIndex = null;
+let openCategory = null;
+let currentImage = "";
 
-    <h2>メニュー一覧</h2>
+const categories = [
+    "定食", "丼・麺", "一品料理", "活魚", "焼鳥", "刺身",
+    "焼魚", "ご飯", "サラダ", "デザート", "飲み物", "その他"
+];
 
-    <input id="searchText" type="text" placeholder="メニュー検索" oninput="showMenus()">
+function saveMenu() {
+    const name = document.getElementById("menuName").value;
+    const price = document.getElementById("menuPrice").value;
+    const category = document.getElementById("menuCategory").value;
+    const description = document.getElementById("menuDescription").value;
+    const itemsText = document.getElementById("menuItems").value;
+    const isRecommended = document.getElementById("isRecommended").checked;
+    const isShimabara = document.getElementById("isShimabara").checked;
+    const isVisible = document.getElementById("isVisible").checked;
+    const showNormal = document.getElementById("showNormal").checked;
+    const showBusy = document.getElementById("showBusy").checked;
+    const isMarketPrice = document.getElementById("isMarketPrice").checked;
 
-    <div id="menuList"></div>
+    if (name === "") {
+        alert("メニュー名を入力してください");
+        return;
+    }
 
-    <script>
-        let menus = [];
-        let editIndex = null;
-        let openCategory = null;
+    if (!isMarketPrice && price === "") {
+        alert("価格を入力するか、時価にチェックを入れてください");
+        return;
+    }
 
-        const categories = [
-            "定食", "丼・麺", "一品料理", "活魚", "焼鳥", "刺身",
-            "焼魚", "ご飯", "サラダ", "デザート", "飲み物", "その他"
-        ];
+    const menu = {
+        name,
+        price,
+        category,
+        description,
+        itemsText,
+        isRecommended,
+        isShimabara,
+        isVisible,
+        showNormal,
+        showBusy,
+        isMarketPrice,
+        image: currentImage
+    };
 
-        function saveMenu() {
-            const name = document.getElementById("menuName").value;
-            const price = document.getElementById("menuPrice").value;
-            const category = document.getElementById("menuCategory").value;
-            const description = document.getElementById("menuDescription").value;
-            const itemsText = document.getElementById("menuItems").value;
-            const isRecommended = document.getElementById("isRecommended").checked;
-            const isShimabara = document.getElementById("isShimabara").checked;
-            const isVisible = document.getElementById("isVisible").checked;
-            const showNormal = document.getElementById("showNormal").checked;
-            const showBusy = document.getElementById("showBusy").checked;
-            const isMarketPrice = document.getElementById("isMarketPrice").checked;
-            const image = document.getElementById("menuImage").value;
+    if (editIndex === null) {
+        menus.push(menu);
+    } else {
+        menus[editIndex] = menu;
+        editIndex = null;
+        document.getElementById("saveButton").textContent = "追加";
+    }
 
-            if (name === "") {
-                alert("メニュー名を入力してください");
-                return;
-            }
+    openCategory = category;
 
-            if (!isMarketPrice && price === "") {
-                alert("価格を入力するか、時価にチェックを入れてください");
-                return;
-            }
+    saveMenus();
+    showMenus();
+    clearForm();
+}
 
-            const menu = {
-                name,
-                price,
-                category,
-                description,
-                itemsText,
-                isRecommended,
-                isShimabara,
-                isVisible,
-                showNormal,
-                showBusy,
-                isMarketPrice,
-                image
-            };
+function showMenus() {
+    const menuList = document.getElementById("menuList");
+    const searchText = document.getElementById("searchText").value;
+    menuList.innerHTML = "";
 
-            if (editIndex === null) {
-                menus.push(menu);
-            } else {
-                menus[editIndex] = menu;
-                editIndex = null;
-                document.getElementById("saveButton").textContent = "追加";
-            }
+    categories.forEach(function(category) {
+        const categoryMenus = menus
+            .map(function(menu, index) {
+                return { menu, index };
+            })
+            .filter(function(item) {
+                const menu = item.menu;
+                const tags = getTagsText(menu);
+                const visibleText = menu.isVisible === false ? "非表示" : "表示中";
+                const normalText = menu.showNormal === false ? "通常なし" : "通常";
+                const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
+                const priceText = getPriceText(menu);
 
-            openCategory = category;
+                return menu.category === category &&
+                    (
+                        menu.name.includes(searchText) ||
+                        (menu.description || "").includes(searchText) ||
+                        (menu.itemsText || "").includes(searchText) ||
+                        menu.category.includes(searchText) ||
+                        tags.includes(searchText) ||
+                        visibleText.includes(searchText) ||
+                        normalText.includes(searchText) ||
+                        busyText.includes(searchText) ||
+                        priceText.includes(searchText)
+                    );
+            });
+
+        if (categoryMenus.length === 0) return;
+
+        const details = document.createElement("details");
+        details.open = searchText !== "" || openCategory === category;
+
+        const summary = document.createElement("summary");
+        summary.textContent = category + "（" + categoryMenus.length + "件）";
+
+        summary.addEventListener("click", function(event) {
+            event.preventDefault();
+            openCategory = openCategory === category ? null : category;
+            showMenus();
+        });
+
+        details.appendChild(summary);
+
+        const ul = document.createElement("ul");
+
+        categoryMenus.forEach(function(item) {
+            const menu = item.menu;
+            const index = item.index;
+            const tags = getTagsText(menu);
+            const visibleText = menu.isVisible === false ? "非表示" : "表示中";
+            const normalText = menu.showNormal === false ? "通常なし" : "通常";
+            const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
+            const itemsHtml = getItemsHtml(menu.itemsText);
+
+            const li = document.createElement("li");
+
+            li.innerHTML = `
+                <strong>${menu.name}</strong>：${getPriceText(menu)}
+                <br>
+                状態：${visibleText} / ${normalText} / ${busyText}
+                <br>
+                ${tags ? "タグ：" + tags + "<br>" : ""}
+
+                <details>
+                    <summary>${menu.image ? "詳細・写真" : "詳細"}</summary>
+
+                    ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
+
+                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+
+                    ${itemsHtml}
+                </details>
+
+                <div class="menu-buttons">
+                    <button type="button" onclick="moveMenuUp(${index})">↑</button>
+                    <button type="button" onclick="moveMenuDown(${index})">↓</button>
+                    <button type="button" onclick="editMenu(${index})">編集</button>
+                    <button type="button" onclick="deleteMenu(${index})">削除</button>
+                </div>
+            `;
+
+            ul.appendChild(li);
+        });
+
+        details.appendChild(ul);
+        menuList.appendChild(details);
+    });
+}
+
+function getItemsHtml(itemsText) {
+    if (!itemsText) return "";
+
+    const items = itemsText
+        .split("\n")
+        .map(function(item) {
+            return item.trim();
+        })
+        .filter(function(item) {
+            return item !== "";
+        });
+
+    if (items.length === 0) return "";
+
+    let html = "内容：<br><ul>";
+
+    items.forEach(function(item) {
+        html += "<li>" + item + "</li>";
+    });
+
+    html += "</ul>";
+    return html;
+}
+
+function handleImageSelect(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const img = new Image();
+
+        img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const maxWidth = 600;
+            const scale = Math.min(maxWidth / img.width, 1);
+
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            currentImage = canvas.toDataURL("image/jpeg", 0.7);
+
+            const preview = document.getElementById("imagePreview");
+            preview.src = currentImage;
+            preview.style.display = "block";
+        };
+
+        img.src = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function clearImage() {
+    currentImage = "";
+    document.getElementById("menuImageFile").value = "";
+    document.getElementById("imagePreview").src = "";
+    document.getElementById("imagePreview").style.display = "none";
+}
+
+function applyCategoryTemplate() {
+    const category = document.getElementById("menuCategory").value;
+    const description = document.getElementById("menuDescription");
+    const isMarketPrice = document.getElementById("isMarketPrice");
+
+    const fishText = "水槽からお選びください。価格は大きさ・状態によって異なります。";
+
+    if (category === "活魚") {
+        if (description.value === "") {
+            description.value = fishText;
+        }
+
+        isMarketPrice.checked = true;
+    } else {
+        if (description.value === fishText) {
+            description.value = "";
+        }
+
+        isMarketPrice.checked = false;
+    }
+}
+
+function getPriceText(menu) {
+    return menu.isMarketPrice ? "時価" : menu.price + "円";
+}
+
+function getTagsText(menu) {
+    let tags = [];
+
+    if (menu.isRecommended) tags.push("おすすめ");
+    if (menu.isShimabara) tags.push("島原名物");
+
+    return tags.join("・");
+}
+
+function editMenu(index) {
+    const menu = menus[index];
+
+    document.getElementById("menuName").value = menu.name;
+    document.getElementById("menuPrice").value = menu.price || "";
+    document.getElementById("menuCategory").value = menu.category;
+    document.getElementById("menuDescription").value = menu.description || "";
+    document.getElementById("menuItems").value = menu.itemsText || "";
+    document.getElementById("isRecommended").checked = menu.isRecommended || false;
+    document.getElementById("isShimabara").checked = menu.isShimabara || false;
+    document.getElementById("isVisible").checked = menu.isVisible !== false;
+    document.getElementById("showNormal").checked = menu.showNormal !== false;
+    document.getElementById("showBusy").checked = menu.showBusy !== false;
+    document.getElementById("isMarketPrice").checked = menu.isMarketPrice || false;
+
+    currentImage = menu.image || "";
+
+    if (currentImage) {
+        const preview = document.getElementById("imagePreview");
+        preview.src = currentImage;
+        preview.style.display = "block";
+    } else {
+        clearImage();
+    }
+
+    editIndex = index;
+    openCategory = menu.category;
+    document.getElementById("saveButton").textContent = "更新";
+    showMenus();
+}
+
+function deleteMenu(index) {
+    openCategory = menus[index].category;
+    menus.splice(index, 1);
+    saveMenus();
+    showMenus();
+}
+
+function moveMenuUp(index) {
+    const currentMenu = menus[index];
+    openCategory = currentMenu.category;
+
+    for (let i = index - 1; i >= 0; i--) {
+        if (menus[i].category === currentMenu.category) {
+            const temp = menus[i];
+            menus[i] = menus[index];
+            menus[index] = temp;
 
             saveMenus();
             showMenus();
-            clearForm();
+            return;
         }
+    }
+}
 
-        function showMenus() {
-            const menuList = document.getElementById("menuList");
-            const searchText = document.getElementById("searchText").value;
-            menuList.innerHTML = "";
+function moveMenuDown(index) {
+    const currentMenu = menus[index];
+    openCategory = currentMenu.category;
 
-            categories.forEach(function(category) {
-                const categoryMenus = menus
-                    .map(function(menu, index) {
-                        return { menu, index };
-                    })
-                    .filter(function(item) {
-                        const menu = item.menu;
-                        const tags = getTagsText(menu);
-                        const visibleText = menu.isVisible === false ? "非表示" : "表示中";
-                        const normalText = menu.showNormal === false ? "通常なし" : "通常";
-                        const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
-                        const priceText = getPriceText(menu);
+    for (let i = index + 1; i < menus.length; i++) {
+        if (menus[i].category === currentMenu.category) {
+            const temp = menus[i];
+            menus[i] = menus[index];
+            menus[index] = temp;
 
-                        return menu.category === category &&
-                            (
-                                menu.name.includes(searchText) ||
-                                (menu.description || "").includes(searchText) ||
-                                (menu.itemsText || "").includes(searchText) ||
-                                menu.category.includes(searchText) ||
-                                tags.includes(searchText) ||
-                                visibleText.includes(searchText) ||
-                                normalText.includes(searchText) ||
-                                busyText.includes(searchText) ||
-                                priceText.includes(searchText)
-                            );
-                    });
-
-                if (categoryMenus.length === 0) return;
-
-                const details = document.createElement("details");
-                details.open = searchText !== "" || openCategory === category;
-
-                const summary = document.createElement("summary");
-                summary.textContent = category + "（" + categoryMenus.length + "件）";
-
-                summary.addEventListener("click", function(event) {
-                    event.preventDefault();
-                    openCategory = openCategory === category ? null : category;
-                    showMenus();
-                });
-
-                details.appendChild(summary);
-
-                const ul = document.createElement("ul");
-
-                categoryMenus.forEach(function(item) {
-                    const menu = item.menu;
-                    const index = item.index;
-                    const tags = getTagsText(menu);
-                    const visibleText = menu.isVisible === false ? "非表示" : "表示中";
-                    const normalText = menu.showNormal === false ? "通常なし" : "通常";
-                    const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
-                    const itemsHtml = getItemsHtml(menu.itemsText);
-
-                    const li = document.createElement("li");
-
-                    li.innerHTML = `
-    <strong>${menu.name}</strong>：${getPriceText(menu)}
-    <br>
-    状態：${visibleText} / ${normalText} / ${busyText}
-    <br>
-    ${tags ? "タグ：" + tags + "<br>" : ""}
-
-    <details>
-        <summary>${menu.image ? "詳細・写真" : "詳細"}</summary>
-
-        ${menu.image ? `<img src="${menu.image}" style="width:100%; max-width:300px; border-radius:10px; margin-top:10px;"><br>` : ""}
-
-        ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-
-        ${itemsHtml}
-    </details>
-
-    <div class="menu-buttons">
-        <button type="button" onclick="moveMenuUp(${index})">↑</button>
-        <button type="button" onclick="moveMenuDown(${index})">↓</button>
-        <button type="button" onclick="editMenu(${index})">編集</button>
-        <button type="button" onclick="deleteMenu(${index})">削除</button>
-    </div>
-`;
-ul.appendChild(li);
-});
-                details.appendChild(ul);
-                menuList.appendChild(details);
-            });
-        }
-
-        function getItemsHtml(itemsText) {
-            if (!itemsText) return "";
-
-            const items = itemsText
-                .split("\n")
-                .map(function(item) {
-                    return item.trim();
-                })
-                .filter(function(item) {
-                    return item !== "";
-                });
-
-            if (items.length === 0) return "";
-
-            let html = "内容：<br><ul>";
-
-            items.forEach(function(item) {
-                html += "<li>" + item + "</li>";
-            });
-
-            html += "</ul>";
-
-            return html;
-        }
-
-        function applyCategoryTemplate() {
-            const category = document.getElementById("menuCategory").value;
-            const description = document.getElementById("menuDescription");
-            const isMarketPrice = document.getElementById("isMarketPrice");
-
-            const fishText = "水槽からお選びください。価格は大きさ・状態によって異なります。";
-
-            if (category === "活魚") {
-                if (description.value === "") {
-                    description.value = fishText;
-                }
-
-                isMarketPrice.checked = true;
-            } else {
-                if (description.value === fishText) {
-                    description.value = "";
-                }
-
-                isMarketPrice.checked = false;
-            }
-        }
-
-        function getPriceText(menu) {
-            return menu.isMarketPrice ? "時価" : menu.price + "円";
-        }
-
-        function getTagsText(menu) {
-            let tags = [];
-
-            if (menu.isRecommended) tags.push("おすすめ");
-            if (menu.isShimabara) tags.push("島原名物");
-
-            return tags.join("・");
-        }
-
-        function editMenu(index) {
-            const menu = menus[index];
-
-            document.getElementById("menuName").value = menu.name;
-            document.getElementById("menuPrice").value = menu.price || "";
-            document.getElementById("menuCategory").value = menu.category;
-            document.getElementById("menuDescription").value = menu.description || "";
-            document.getElementById("menuItems").value = menu.itemsText || "";
-            document.getElementById("isRecommended").checked = menu.isRecommended || false;
-            document.getElementById("isShimabara").checked = menu.isShimabara || false;
-            document.getElementById("isVisible").checked = menu.isVisible !== false;
-            document.getElementById("showNormal").checked = menu.showNormal !== false;
-            document.getElementById("showBusy").checked = menu.showBusy !== false;
-            document.getElementById("isMarketPrice").checked = menu.isMarketPrice || false;
-            document.getElementById("menuImage").value = menu.image || "";
-
-            editIndex = index;
-            openCategory = menu.category;
-            document.getElementById("saveButton").textContent = "更新";
-            showMenus();
-        }
-
-        function deleteMenu(index) {
-            openCategory = menus[index].category;
-            menus.splice(index, 1);
             saveMenus();
             showMenus();
+            return;
         }
+    }
+}
 
-        function moveMenuUp(index) {
-            const currentMenu = menus[index];
-            openCategory = currentMenu.category;
+function clearForm() {
+    document.getElementById("menuName").value = "";
+    document.getElementById("menuPrice").value = "";
+    document.getElementById("menuDescription").value = "";
+    document.getElementById("menuItems").value = "";
+    document.getElementById("isRecommended").checked = false;
+    document.getElementById("isShimabara").checked = false;
+    document.getElementById("isVisible").checked = true;
+    document.getElementById("showNormal").checked = true;
+    document.getElementById("showBusy").checked = true;
+    document.getElementById("isMarketPrice").checked = false;
+    clearImage();
+}
 
-            for (let i = index - 1; i >= 0; i--) {
-                if (menus[i].category === currentMenu.category) {
-                    const temp = menus[i];
-                    menus[i] = menus[index];
-                    menus[index] = temp;
+function saveMenus() {
+    localStorage.setItem("orderSystemMenus", JSON.stringify(menus));
+}
 
-                    saveMenus();
-                    showMenus();
-                    return;
-                }
-            }
-        }
+function loadMenus() {
+    const savedMenus = localStorage.getItem("orderSystemMenus");
 
-        function moveMenuDown(index) {
-            const currentMenu = menus[index];
-            openCategory = currentMenu.category;
+    if (savedMenus) {
+        menus = JSON.parse(savedMenus);
+    }
 
-            for (let i = index + 1; i < menus.length; i++) {
-                if (menus[i].category === currentMenu.category) {
-                    const temp = menus[i];
-                    menus[i] = menus[index];
-                    menus[index] = temp;
+    showMenus();
+}
 
-                    saveMenus();
-                    showMenus();
-                    return;
-                }
-            }
-        }
-
-        function clearForm() {
-            document.getElementById("menuName").value = "";
-            document.getElementById("menuPrice").value = "";
-            document.getElementById("menuDescription").value = "";
-            document.getElementById("menuItems").value = "";
-            document.getElementById("menuImage").value = "";
-            document.getElementById("isRecommended").checked = false;
-            document.getElementById("isShimabara").checked = false;
-            document.getElementById("isVisible").checked = true;
-            document.getElementById("showNormal").checked = true;
-            document.getElementById("showBusy").checked = true;
-            document.getElementById("isMarketPrice").checked = false;
-        }
-
-        function saveMenus() {
-            localStorage.setItem("orderSystemMenus", JSON.stringify(menus));
-        }
-
-        function loadMenus() {
-            const savedMenus = localStorage.getItem("orderSystemMenus");
-
-            if (savedMenus) {
-                menus = JSON.parse(savedMenus);
-            }
-
-            showMenus();
-        }
-
-        loadMenus();
-    </script>
+loadMenus();
+</script>
 
 </body>
 </html>
