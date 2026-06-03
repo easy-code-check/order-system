@@ -12,13 +12,30 @@
     <input id="menuPrice" type="number" placeholder="価格">
 
     <select id="menuCategory">
-        <option value="おすすめ・島原名物">おすすめ・島原名物</option>
         <option value="定食">定食</option>
         <option value="丼・麺">丼・麺</option>
         <option value="一品料理">一品料理</option>
+        <option value="焼鳥">焼鳥</option>
+        <option value="刺身">刺身</option>
+        <option value="焼魚">焼魚</option>
+        <option value="ご飯">ご飯</option>
+        <option value="サラダ">サラダ</option>
+        <option value="デザート">デザート</option>
         <option value="飲み物">飲み物</option>
         <option value="その他">その他</option>
     </select>
+
+    <br>
+
+    <label>
+        <input id="isRecommended" type="checkbox">
+        おすすめ
+    </label>
+
+    <label>
+        <input id="isShimabara" type="checkbox">
+        島原名物
+    </label>
 
     <br>
 
@@ -39,10 +56,15 @@
         let editIndex = null;
 
         const categories = [
-            "おすすめ・島原名物",
             "定食",
             "丼・麺",
             "一品料理",
+            "焼鳥",
+            "刺身",
+            "焼魚",
+            "ご飯",
+            "サラダ",
+            "デザート",
             "飲み物",
             "その他"
         ];
@@ -52,6 +74,8 @@
             const price = document.getElementById("menuPrice").value;
             const category = document.getElementById("menuCategory").value;
             const description = document.getElementById("menuDescription").value;
+            const isRecommended = document.getElementById("isRecommended").checked;
+            const isShimabara = document.getElementById("isShimabara").checked;
 
             if (name === "" || price === "") {
                 alert("メニュー名と価格を入力してください");
@@ -62,7 +86,9 @@
                 name: name,
                 price: price,
                 category: category,
-                description: description
+                description: description,
+                isRecommended: isRecommended,
+                isShimabara: isShimabara
             };
 
             if (editIndex === null) {
@@ -91,11 +117,14 @@
                     .filter(function(item) {
                         const menu = item.menu;
 
+                        const tags = getTagsText(menu);
+
                         const isSameCategory = menu.category === category;
                         const isSearchMatch =
                             menu.name.includes(searchText) ||
                             menu.description.includes(searchText) ||
-                            menu.category.includes(searchText);
+                            menu.category.includes(searchText) ||
+                            tags.includes(searchText);
 
                         return isSameCategory && isSearchMatch;
                     });
@@ -116,12 +145,14 @@
                 categoryMenus.forEach(function(item) {
                     const menu = item.menu;
                     const index = item.index;
+                    const tags = getTagsText(menu);
 
                     const li = document.createElement("li");
 
                     li.innerHTML = `
                         <strong>${menu.name}</strong>：${menu.price}円
                         <br>
+                        ${tags ? "タグ：" + tags + "<br>" : ""}
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
                         <button onclick="editMenu(${index})">編集</button>
                         <button onclick="deleteMenu(${index})">削除</button>
@@ -135,13 +166,29 @@
             });
         }
 
+        function getTagsText(menu) {
+            let tags = [];
+
+            if (menu.isRecommended) {
+                tags.push("おすすめ");
+            }
+
+            if (menu.isShimabara) {
+                tags.push("島原名物");
+            }
+
+            return tags.join("・");
+        }
+
         function editMenu(index) {
             const menu = menus[index];
 
             document.getElementById("menuName").value = menu.name;
             document.getElementById("menuPrice").value = menu.price;
             document.getElementById("menuCategory").value = menu.category;
-            document.getElementById("menuDescription").value = menu.description;
+            document.getElementById("menuDescription").value = menu.description || "";
+            document.getElementById("isRecommended").checked = menu.isRecommended || false;
+            document.getElementById("isShimabara").checked = menu.isShimabara || false;
 
             editIndex = index;
             document.getElementById("saveButton").textContent = "更新";
@@ -157,6 +204,8 @@
             document.getElementById("menuName").value = "";
             document.getElementById("menuPrice").value = "";
             document.getElementById("menuDescription").value = "";
+            document.getElementById("isRecommended").checked = false;
+            document.getElementById("isShimabara").checked = false;
         }
 
         function saveMenus() {
