@@ -11,6 +11,21 @@
     <input id="menuName" type="text" placeholder="メニュー名">
     <input id="menuPrice" type="number" placeholder="価格">
 
+    <select id="menuCategory">
+        <option value="おすすめ・島原名物">おすすめ・島原名物</option>
+        <option value="定食">定食</option>
+        <option value="丼・麺">丼・麺</option>
+        <option value="一品料理">一品料理</option>
+        <option value="飲み物">飲み物</option>
+        <option value="その他">その他</option>
+    </select>
+
+    <br>
+
+    <textarea id="menuDescription" placeholder="説明文（セット内容など・空欄OK）"></textarea>
+
+    <br>
+
     <button onclick="addMenu()">追加</button>
 
     <h2>メニュー一覧</h2>
@@ -22,10 +37,19 @@
         function addMenu() {
             const name = document.getElementById("menuName").value;
             const price = document.getElementById("menuPrice").value;
+            const category = document.getElementById("menuCategory").value;
+            const description = document.getElementById("menuDescription").value;
+
+            if (name === "" || price === "") {
+                alert("メニュー名と価格を入力してください");
+                return;
+            }
 
             const menu = {
                 name: name,
-                price: price
+                price: price,
+                category: category,
+                description: description
             };
 
             menus.push(menu);
@@ -34,17 +58,32 @@
 
             document.getElementById("menuName").value = "";
             document.getElementById("menuPrice").value = "";
+            document.getElementById("menuDescription").value = "";
         }
 
         function showMenus() {
             const menuList = document.getElementById("menuList");
             menuList.innerHTML = "";
 
-            menus.forEach(function(menu) {
+            menus.forEach(function(menu, index) {
                 const li = document.createElement("li");
-                li.textContent = menu.name + "：" + menu.price + "円";
+
+                li.innerHTML = `
+                    <strong>${menu.name}</strong>：${menu.price}円
+                    <br>
+                    カテゴリ：${menu.category}
+                    <br>
+                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                    <button onclick="deleteMenu(${index})">削除</button>
+                `;
+
                 menuList.appendChild(li);
             });
+        }
+
+        function deleteMenu(index) {
+            menus.splice(index, 1);
+            showMenus();
         }
     </script>
 
