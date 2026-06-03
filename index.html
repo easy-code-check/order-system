@@ -235,7 +235,7 @@
     ${tags ? "タグ：" + tags + "<br>" : ""}
 
     <details>
-        <summary>詳細・写真</summary>
+        <summary>${menu.image ? "詳細・写真" : "詳細"}</summary>
 
         ${menu.image ? `<img src="${menu.image}" style="width:100%; max-width:300px; border-radius:10px; margin-top:10px;"><br>` : ""}
 
