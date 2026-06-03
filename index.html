@@ -15,6 +15,7 @@
         <option value="定食">定食</option>
         <option value="丼・麺">丼・麺</option>
         <option value="一品料理">一品料理</option>
+        <option value="活魚">活魚</option>
         <option value="焼鳥">焼鳥</option>
         <option value="刺身">刺身</option>
         <option value="焼魚">焼魚</option>
@@ -39,6 +40,13 @@
 
     <br>
 
+    <label>
+        <input id="isVisible" type="checkbox" checked>
+        お客さんに表示する
+    </label>
+
+    <br>
+
     <textarea id="menuDescription" placeholder="説明文（セット内容など・空欄OK）"></textarea>
 
     <br>
@@ -59,6 +67,7 @@
             "定食",
             "丼・麺",
             "一品料理",
+            "活魚",
             "焼鳥",
             "刺身",
             "焼魚",
@@ -76,6 +85,7 @@
             const description = document.getElementById("menuDescription").value;
             const isRecommended = document.getElementById("isRecommended").checked;
             const isShimabara = document.getElementById("isShimabara").checked;
+            const isVisible = document.getElementById("isVisible").checked;
 
             if (name === "" || price === "") {
                 alert("メニュー名と価格を入力してください");
@@ -88,7 +98,8 @@
                 category: category,
                 description: description,
                 isRecommended: isRecommended,
-                isShimabara: isShimabara
+                isShimabara: isShimabara,
+                isVisible: isVisible
             };
 
             if (editIndex === null) {
@@ -116,15 +127,16 @@
                     })
                     .filter(function(item) {
                         const menu = item.menu;
-
                         const tags = getTagsText(menu);
+                        const visibleText = menu.isVisible === false ? "非表示" : "表示中";
 
                         const isSameCategory = menu.category === category;
                         const isSearchMatch =
                             menu.name.includes(searchText) ||
-                            menu.description.includes(searchText) ||
+                            (menu.description || "").includes(searchText) ||
                             menu.category.includes(searchText) ||
-                            tags.includes(searchText);
+                            tags.includes(searchText) ||
+                            visibleText.includes(searchText);
 
                         return isSameCategory && isSearchMatch;
                     });
@@ -146,11 +158,14 @@
                     const menu = item.menu;
                     const index = item.index;
                     const tags = getTagsText(menu);
+                    const visibleText = menu.isVisible === false ? "非表示" : "表示中";
 
                     const li = document.createElement("li");
 
                     li.innerHTML = `
                         <strong>${menu.name}</strong>：${menu.price}円
+                        <br>
+                        状態：${visibleText}
                         <br>
                         ${tags ? "タグ：" + tags + "<br>" : ""}
                         ${menu.description ? "説明：" + menu.description + "<br>" : ""}
@@ -189,6 +204,7 @@
             document.getElementById("menuDescription").value = menu.description || "";
             document.getElementById("isRecommended").checked = menu.isRecommended || false;
             document.getElementById("isShimabara").checked = menu.isShimabara || false;
+            document.getElementById("isVisible").checked = menu.isVisible !== false;
 
             editIndex = index;
             document.getElementById("saveButton").textContent = "更新";
@@ -206,6 +222,7 @@
             document.getElementById("menuDescription").value = "";
             document.getElementById("isRecommended").checked = false;
             document.getElementById("isShimabara").checked = false;
+            document.getElementById("isVisible").checked = true;
         }
 
         function saveMenus() {
