@@ -32,60 +32,78 @@
     <ul id="menuList"></ul>
 
     <script>
-        let menus = [];
+    let menus = [];
 
-        function addMenu() {
-            const name = document.getElementById("menuName").value;
-            const price = document.getElementById("menuPrice").value;
-            const category = document.getElementById("menuCategory").value;
-            const description = document.getElementById("menuDescription").value;
+    loadMenus();
 
-            if (name === "" || price === "") {
-                alert("メニュー名と価格を入力してください");
-                return;
-            }
+    function addMenu() {
+        const name = document.getElementById("menuName").value;
+        const price = document.getElementById("menuPrice").value;
+        const category = document.getElementById("menuCategory").value;
+        const description = document.getElementById("menuDescription").value;
 
-            const menu = {
-                name: name,
-                price: price,
-                category: category,
-                description: description
-            };
-
-            menus.push(menu);
-
-            showMenus();
-
-            document.getElementById("menuName").value = "";
-            document.getElementById("menuPrice").value = "";
-            document.getElementById("menuDescription").value = "";
+        if (name === "" || price === "") {
+            alert("メニュー名と価格を入力してください");
+            return;
         }
 
-        function showMenus() {
-            const menuList = document.getElementById("menuList");
-            menuList.innerHTML = "";
+        const menu = {
+            name: name,
+            price: price,
+            category: category,
+            description: description
+        };
 
-            menus.forEach(function(menu, index) {
-                const li = document.createElement("li");
+        menus.push(menu);
 
-                li.innerHTML = `
-                    <strong>${menu.name}</strong>：${menu.price}円
-                    <br>
-                    カテゴリ：${menu.category}
-                    <br>
-                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-                    <button onclick="deleteMenu(${index})">削除</button>
-                `;
+        saveMenus();
+        showMenus();
 
-                menuList.appendChild(li);
-            });
+        document.getElementById("menuName").value = "";
+        document.getElementById("menuPrice").value = "";
+        document.getElementById("menuDescription").value = "";
+    }
+
+    function showMenus() {
+        const menuList = document.getElementById("menuList");
+        menuList.innerHTML = "";
+
+        menus.forEach(function(menu, index) {
+            const li = document.createElement("li");
+
+            li.innerHTML = `
+                <strong>${menu.name}</strong>：${menu.price}円
+                <br>
+                カテゴリ：${menu.category}
+                <br>
+                ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                <button onclick="deleteMenu(${index})">削除</button>
+            `;
+
+            menuList.appendChild(li);
+        });
+    }
+
+    function deleteMenu(index) {
+        menus.splice(index, 1);
+        saveMenus();
+        showMenus();
+    }
+
+    function saveMenus() {
+        localStorage.setItem("orderSystemMenus", JSON.stringify(menus));
+    }
+
+    function loadMenus() {
+        const savedMenus = localStorage.getItem("orderSystemMenus");
+
+        if (savedMenus) {
+            menus = JSON.parse(savedMenus);
         }
 
-        function deleteMenu(index) {
-            menus.splice(index, 1);
-            showMenus();
-        }
-    </script>
+        showMenus();
+    }
+</script>
 
 </body>
 </html>
