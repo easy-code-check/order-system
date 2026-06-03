@@ -109,6 +109,7 @@ li { margin-bottom: 16px; line-height: 1.6; }
 let menus = [];
 let editIndex = null;
 let openCategory = null;
+let openMenuDetail = null;
 let currentImage = "";
 
 const categories = [
@@ -227,7 +228,7 @@ function showMenus() {
             const normalText = menu.showNormal === false ? "通常なし" : "通常";
             const busyText = menu.showBusy === false ? "忙しい日なし" : "忙しい日";
             const itemsHtml = getItemsHtml(menu.itemsText);
-
+            const detailId = category + "-" + index;
             const li = document.createElement("li");
 
             li.innerHTML = `
@@ -237,15 +238,20 @@ function showMenus() {
                 <br>
                 ${tags ? "タグ：" + tags + "<br>" : ""}
 
-                <details>
-                    <summary>${menu.image ? "詳細・写真" : "詳細"}</summary>
+                <details ${openMenuDetail === detailId ? "open" : ""}>
+    <summary onclick="
+        event.preventDefault();
 
-                    ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
+        if(openMenuDetail === '${detailId}'){
+            openMenuDetail = null;
+        }else{
+            openMenuDetail = '${detailId}';
+        }
 
-                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-
-                    ${itemsHtml}
-                </details>
+        showMenus();
+    ">
+        ${menu.image ? "詳細・写真" : "詳細"}
+    </summary>
 
                 <div class="menu-buttons">
                     <button type="button" onclick="moveMenuUp(${index})">↑</button>
