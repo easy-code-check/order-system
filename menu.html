@@ -241,41 +241,47 @@ function showMenus() {
             const li = document.createElement("li");
             li.id = "menu-" + index;
 
-            li.innerHTML = `
-                <strong>${menu.name}</strong>：${getPriceText(menu)}
-                <br>
+           li.innerHTML = `
+            <strong>${menu.name}</strong>：${getPriceText(menu)}
+
+            <details ${openMenuDetail === detailId ? "open" : ""}>
+                <summary onclick="
+                    event.preventDefault();
+
+                    if(openMenuDetail === '${detailId}'){
+                        openMenuDetail = null;
+                    }else{
+                        openMenuDetail = '${detailId}';
+                    }
+
+                    showMenus();
+                ">
+                    ${menu.image ? "詳細・写真" : "詳細"}
+                </summary>
+
                 状態：${visibleText} / ${normalText} / ${busyText}
                 <br>
+
                 ${tags ? "タグ：" + tags + "<br>" : ""}
+
                 ${menu.options && menu.options.length > 0 ? "選択肢：" + menu.options.length + "項目<br>" : ""}
 
-                <details ${openMenuDetail === detailId ? "open" : ""}>
-                    <summary onclick="
-                        event.preventDefault();
+                ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
 
-                        if(openMenuDetail === '${detailId}'){
-                            openMenuDetail = null;
-                        }else{
-                        openMenuDetail = '${detailId}';
-                        }
+                ${menu.description ? "説明：" + menu.description + "<br>" : ""}
 
-                        showMenus();
-                         ">
-                        ${menu.image ? "詳細・写真" : "詳細"}
-                    </summary>
-                    ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
-                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-                    ${itemsHtml}
-                    ${getOptionsHtml(menu.options)}
-                </details>
+                ${itemsHtml}
 
-                <div class="menu-buttons">
-                    <button type="button" onclick="moveMenuUp(${index})">↑</button>
-                    <button type="button" onclick="moveMenuDown(${index})">↓</button>
-                    <button type="button" onclick="editMenu(${index})">編集</button>
-                    <button type="button" onclick="deleteMenu(${index})">削除</button>
-                </div>
-            `;
+                ${getOptionsHtml(menu.options)}
+            </details>
+
+            <div class="menu-buttons">
+                <button type="button" onclick="moveMenuUp(${index})">↑</button>
+                <button type="button" onclick="moveMenuDown(${index})">↓</button>
+                <button type="button" onclick="editMenu(${index})">編集</button>
+                <button type="button" onclick="deleteMenu(${index})">削除</button>
+            </div>
+        `;
 
             ul.appendChild(li);
         });
@@ -527,6 +533,7 @@ function deleteMenu(index) {
 function moveMenuUp(index) {
     const currentMenu = menus[index];
     openCategory = currentMenu.category;
+    openMenuDetail = null;
 
     for (let i = index - 1; i >= 0; i--) {
         if (menus[i].category === currentMenu.category) {
@@ -545,6 +552,7 @@ function moveMenuUp(index) {
 function moveMenuDown(index) {
     const currentMenu = menus[index];
     openCategory = currentMenu.category;
+    openMenuDetail = null;
 
     for (let i = index + 1; i < menus.length; i++) {
         if (menus[i].category === currentMenu.category) {
