@@ -264,6 +264,7 @@ function showMenus() {
     ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
     ${menu.description ? "説明：" + menu.description + "<br>" : ""}
     ${itemsHtml}
+    ${getOptionsHtml(menu.options)}
     </details>
 
                 <div class="menu-buttons">
@@ -304,9 +305,9 @@ function getItemsHtml(itemsText) {
 
     html += "</ul>";
     return html;
-}
+    }
 
-    function addOptionGroup(title = "", choicesText = "") {
+function addOptionGroup(title = "", choicesText = "") {
     const optionGroups = document.getElementById("optionGroups");
 
     const div = document.createElement("div");
@@ -375,6 +376,23 @@ function getOptionGroups() {
     });
 
     return groups;
+}
+function getOptionsHtml(options) {
+    if (!options || options.length === 0) return "";
+
+    let html = "選択肢：<br>";
+
+    options.forEach(function(option) {
+        html += "<strong>" + option.title + "</strong><br><ul>";
+
+        option.choices.forEach(function(choice) {
+            html += "<li>" + choice + "</li>";
+        });
+
+        html += "</ul>";
+    });
+
+    return html;
 }
 function handleImageSelect(event) {
     const file = event.target.files[0];
@@ -468,7 +486,14 @@ function editMenu(index) {
     document.getElementById("showNormal").checked = menu.showNormal !== false;
     document.getElementById("showBusy").checked = menu.showBusy !== false;
     document.getElementById("isMarketPrice").checked = menu.isMarketPrice || false;
+    document.getElementById("optionGroups").innerHTML = "";
 
+    if (menu.options) {
+        menu.options.forEach(function(option) {
+            addOptionGroup(option.title, option.choices.join("\n"));
+        });
+    }
+    
     currentImage = menu.image || "";
 
     if (currentImage) {
@@ -531,6 +556,7 @@ function clearForm() {
     document.getElementById("menuPrice").value = "";
     document.getElementById("menuDescription").value = "";
     document.getElementById("menuItems").value = "";
+    document.getElementById("optionGroups").innerHTML = "";
     document.getElementById("isRecommended").checked = false;
     document.getElementById("isShimabara").checked = false;
     document.getElementById("isVisible").checked = true;
