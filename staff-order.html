@@ -112,6 +112,30 @@ function getPriceText(menu) {
   return menu.price + "円";
 }
 
+function getVisibleChoices(option) {
+  if (!option || !Array.isArray(option.choices)) {
+    return [];
+  }
+
+  return option.choices.filter(function(choice) {
+
+    // 旧データ対応
+    if (typeof choice === "string") {
+      return true;
+    }
+
+    return choice.visible !== false;
+  });
+}
+
+function getChoiceName(choice) {
+
+  if (typeof choice === "string") {
+    return choice;
+  }
+
+  return choice.name;
+}
 function showMenus() {
   const menuList = document.getElementById("menuList");
   const searchText = document.getElementById("searchText").value;
@@ -136,11 +160,43 @@ function showMenus() {
     const div = document.createElement("div");
     div.className = "menu-item";
 
-    div.innerHTML = `
-      <strong>${menu.name}</strong><br>
-      ${getPriceText(menu)}<br>
-      カテゴリ：${menu.category || "未設定"}
+    let optionsHtml = "";
+
+if (menu.options && menu.options.length > 0) {
+
+  menu.options.forEach(function(option) {
+
+    const visibleChoices =
+      getVisibleChoices(option);
+
+    if (visibleChoices.length === 0) {
+      return;
+    }
+
+    optionsHtml += `
+      <div style="margin-top:8px;">
+        <strong>${option.title}</strong><br>
     `;
+
+    visibleChoices.forEach(function(choice) {
+
+      optionsHtml += `
+        ・${getChoiceName(choice)}<br>
+      `;
+
+    });
+
+    optionsHtml += `</div>`;
+  });
+}
+
+div.innerHTML = `
+  <strong>${menu.name}</strong><br>
+  ${getPriceText(menu)}<br>
+  カテゴリ：${menu.category || "未設定"}
+
+  ${optionsHtml}
+`;
 
     menuList.appendChild(div);
   });
