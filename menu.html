@@ -428,7 +428,18 @@ function getOptionsHtml(options) {
         html += "<strong>" + option.title + "</strong><br><ul>";
 
         option.choices.forEach(function(choice) {
-            html += "<li>" + choice + "</li>";
+            let name = "";
+            let visible = true;
+
+            if (typeof choice === "string") {
+                name = choice;
+                visible = true;
+            } else {
+                name = choice.name;
+                visible = choice.visible !== false;
+            }
+
+            html += "<li>" + name + "（" + (visible ? "表示中" : "非表示") + "）</li>";
         });
 
         html += "</ul>";
