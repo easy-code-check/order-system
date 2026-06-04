@@ -156,7 +156,7 @@ function showMenus() {
     return;
   }
 
-  visibleMenus.forEach(function(menu) {
+  visibleMenus.forEach(function(menu, menuIndex) {
     const div = document.createElement("div");
     div.className = "menu-item";
 
@@ -181,8 +181,16 @@ if (menu.options && menu.options.length > 0) {
     visibleChoices.forEach(function(choice) {
 
       optionsHtml += `
-        ・${getChoiceName(choice)}<br>
-      `;
+  <label>
+    <input
+      type="radio"
+      name="option-${menuIndex}-${option.title}"
+      value="${getChoiceName(choice)}"
+    >
+    ${getChoiceName(choice)}
+  </label>
+  <br>
+`;
 
     });
 
@@ -196,6 +204,10 @@ div.innerHTML = `
   カテゴリ：${menu.category || "未設定"}
 
   ${optionsHtml}
+
+  <button type="button">
+    追加
+  </button>
 `;
 
     menuList.appendChild(div);
