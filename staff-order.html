@@ -88,6 +88,7 @@ const tables = [
 ];
 
 let menus = [];
+let cart = [];
 
 function createTableOptions() {
   const select = document.getElementById("tableNumber");
@@ -206,13 +207,48 @@ div.innerHTML = `
 
   ${optionsHtml}
 
-  <button type="button">
-    追加
-  </button>
+  <button
+  type="button"
+  onclick="addToCart(${menus.indexOf(menu)})"
+>
+  追加
+</button>
 `;
 
     menuList.appendChild(div);
   });
+}
+function addToCart(menuIndex) {
+
+  const menu = menus[menuIndex];
+
+  const selectedOptions = [];
+
+  if (menu.options) {
+
+    menu.options.forEach(function(option) {
+
+      const radio = document.querySelector(
+        `input[name="option-${menuIndex}-${option.title}"]:checked`
+      );
+
+      if (radio) {
+        selectedOptions.push({
+          title: option.title,
+          choice: radio.value
+        });
+      }
+
+    });
+
+  }
+
+  console.log("追加");
+
+  console.log(menu.name);
+
+  console.log(selectedOptions);
+
 }
 
 createTableOptions();
