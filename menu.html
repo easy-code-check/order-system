@@ -72,6 +72,13 @@ li { margin-bottom: 16px; line-height: 1.6; }
 具雑煮
 ガンバずし
 かんざらし"></textarea>
+
+<br><br>
+
+<label>選択肢設定</label>
+<div id="optionGroups"></div>
+
+<button type="button" onclick="addOptionGroup()">選択肢グループを追加</button>
 </section>
 
 <section>
@@ -123,6 +130,7 @@ function saveMenu() {
     const category = document.getElementById("menuCategory").value;
     const description = document.getElementById("menuDescription").value;
     const itemsText = document.getElementById("menuItems").value;
+    const options = getOptionGroups();
     const isRecommended = document.getElementById("isRecommended").checked;
     const isShimabara = document.getElementById("isShimabara").checked;
     const isVisible = document.getElementById("isVisible").checked;
@@ -153,6 +161,7 @@ function saveMenu() {
         showBusy,
         isMarketPrice,
         image: currentImage
+        options
     };
 
     if (editIndex === null) {
@@ -297,6 +306,76 @@ function getItemsHtml(itemsText) {
     return html;
 }
 
+    function addOptionGroup(title = "", choicesText = "") {
+    const optionGroups = document.getElementById("optionGroups");
+
+    const div = document.createElement("div");
+    div.className = "option-group";
+
+    div.innerHTML = `
+        <hr>
+
+        <label>項目名</label>
+        <input
+            type="text"
+            class="option-title"
+            placeholder="例：汁物"
+            value="${title}"
+        >
+
+        <br><br>
+
+        <label>選択肢（1行ずつ入力）</label>
+        <textarea
+            class="option-choices"
+            placeholder="例：
+具雑煮
+ソーメン"
+        >${choicesText}</textarea>
+
+        <br>
+
+        <button
+            type="button"
+            onclick="this.parentElement.remove()"
+        >
+            この選択肢を削除
+        </button>
+    `;
+
+    optionGroups.appendChild(div);
+}
+
+function getOptionGroups() {
+    const groups = [];
+
+    document.querySelectorAll(".option-group").forEach(function(group) {
+
+        const title =
+            group.querySelector(".option-title").value;
+
+        const choicesText =
+            group.querySelector(".option-choices").value;
+
+        const choices = choicesText
+            .split("\n")
+            .map(function(choice) {
+                return choice.trim();
+            })
+            .filter(function(choice) {
+                return choice !== "";
+            });
+
+        if (title !== "" && choices.length > 0) {
+            groups.push({
+                title: title,
+                choices: choices
+            });
+        }
+    });
+
+    return groups;
+}
 function handleImageSelect(event) {
     const file = event.target.files[0];
 
