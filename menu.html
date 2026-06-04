@@ -531,10 +531,13 @@ function editMenu(index) {
     document.getElementById("optionGroups").innerHTML = "";
 
     if (menu.options) {
-        menu.options.forEach(function(option) {
-            addOptionGroup(option.title, option.choices.join("\n"));
-        });
-    }
+    menu.options.forEach(function(option) {
+        addOptionGroup(
+            option.title,
+            option.choices
+        );
+    });
+}	
     
     currentImage = menu.image || "";
 
