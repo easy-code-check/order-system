@@ -1,1 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>スタッフ注文</title>
 
+<style>
+body {
+  font-family: sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 16px;
+}
+
+h1 {
+  text-align: center;
+}
+
+section {
+  background: white;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+}
+
+select, input, button {
+  font-size: 16px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+select, input {
+  width: 100%;
+}
+
+button {
+  border: none;
+  border-radius: 6px;
+  background: #333;
+  color: white;
+  margin-top: 8px;
+}
+
+.menu-item {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+}
+
+.empty {
+  color: #777;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<h1>スタッフ注文</h1>
+
+<section>
+  <h2>席番号</h2>
+  <select id="tableNumber">
+    <option value="">席を選択してください</option>
+  </select>
+</section>
+
+<section>
+  <h2>メニュー検索</h2>
+  <input id="searchText" type="text" placeholder="メニュー名・カテゴリで検索" oninput="showMenus()">
+</section>
+
+<section>
+  <h2>メニュー一覧</h2>
+  <div id="menuList"></div>
+</section>
+
+<script>
+const MENU_KEY = "orderSystemMenus";
+const ORDER_KEY = "orderSystemOrders";
+
+const tables = [
+  "1", "2", "3", "4", "5", "6", "7", "8",
+  "10", "11", "12",
+  "13A", "13B", "13C",
+  "14", "15", "16", "17", "18",
+  "VIP"
+];
+
+let menus = [];
+
+function createTableOptions() {
+  const select = document.getElementById("tableNumber");
+
+  tables.forEach(function(table) {
+    const option = document.createElement("option");
+    option.value = table;
+    option.textContent = table + "席";
+    select.appendChild(option);
+  });
+}
+
+function loadMenus() {
+  menus = JSON.parse(localStorage.getItem(MENU_KEY) || "[]");
+  showMenus();
+}
+
+function getPriceText(menu) {
+  if (menu.isMarketPrice) {
+    return "時価";
+  }
+
+  return menu.price + "円";
+}
+
+function showMenus() {
+  const menuList = document.getElementById("menuList");
+  const searchText = document.getElementById("searchText").value;
+
+  menuList.innerHTML = "";
+
+  const visibleMenus = menus.filter(function(menu) {
+    return menu.isVisible !== false &&
+      (
+        menu.name.includes(searchText) ||
+        (menu.category || "").includes(searchText) ||
+        (menu.description || "").includes(searchText)
+      );
+  });
+
+  if (visibleMenus.length === 0) {
+    menuList.innerHTML = '<p class="empty">表示できるメニューがありません。</p>';
+    return;
+  }
+
+  visibleMenus.forEach(function(menu) {
+    const div = document.createElement("div");
+    div.className = "menu-item";
+
+    div.innerHTML = `
+      <strong>${menu.name}</strong><br>
+      ${getPriceText(menu)}<br>
+      カテゴリ：${menu.category || "未設定"}
+    `;
+
+    menuList.appendChild(div);
+  });
+}
+
+createTableOptions();
+loadMenus();
+</script>
+
+</body>
+</html>
