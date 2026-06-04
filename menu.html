@@ -315,7 +315,7 @@ function getItemsHtml(itemsText) {
     return html;
     }
 
-function addOptionGroup(title = "", choicesText = "") {
+function addOptionGroup(title = "", choices = []) {
     const optionGroups = document.getElementById("optionGroups");
 
     const div = document.createElement("div");
@@ -334,46 +334,80 @@ function addOptionGroup(title = "", choicesText = "") {
 
         <br><br>
 
-        <label>選択肢（1行ずつ入力）</label>
-        <textarea
-            class="option-choices"
-            placeholder="例：
-具雑煮
-ソーメン"
-        >${choicesText}</textarea>
+        <label>選択肢</label>
+        <div class="choice-list"></div>
+
+        <button type="button" onclick="addChoiceRow(this.parentElement.querySelector('.choice-list'))">
+            選択肢を追加
+        </button>
 
         <br>
 
-        <button
-            type="button"
-            onclick="this.parentElement.remove()"
-        >
-            この選択肢を削除
+        <button type="button" onclick="this.parentElement.remove()">
+            この選択肢グループを削除
         </button>
     `;
 
     optionGroups.appendChild(div);
+
+    const choiceList = div.querySelector(".choice-list");
+
+    if (choices.length === 0) {
+        addChoiceRow(choiceList);
+    } else {
+        choices.forEach(function(choice) {
+            if (typeof choice === "string") {
+                addChoiceRow(choiceList, choice, true);
+            } else {
+                addChoiceRow(choiceList, choice.name, choice.visible !== false);
+            }
+        });
+    }
+}
+
+function addChoiceRow(choiceList, name = "", visible = true) {
+    const row = document.createElement("div");
+    row.className = "choice-row";
+
+    row.innerHTML = `
+        <input
+            type="text"
+            class="choice-name"
+            placeholder="例：具雑煮"
+            value="${name}"
+        >
+
+        <label>
+            <input type="checkbox" class="choice-visible" ${visible ? "checked" : ""}>
+            表示
+        </label>
+
+        <button type="button" onclick="this.parentElement.remove()">
+            削除
+        </button>
+    `;
+
+    choiceList.appendChild(row);
 }
 
 function getOptionGroups() {
     const groups = [];
 
     document.querySelectorAll(".option-group").forEach(function(group) {
+        const title = group.querySelector(".option-title").value;
+        const choices = [];
 
-        const title =
-            group.querySelector(".option-title").value;
+        group.querySelectorAll(".choice-row").forEach(function(row) {
+            const name = row.querySelector(".choice-name").value.trim();
+            const visible = row.querySelector(".choice-visible").checked;
 
-        const choicesText =
-            group.querySelector(".option-choices").value;
-
-        const choices = choicesText
-            .split("\n")
-            .map(function(choice) {
-                return choice.trim();
-            })
-            .filter(function(choice) {
-                return choice !== "";
-            });
+            if (name !== "") {
+                choices.push({
+                    name: name,
+                    visible: visible
+                });
+            }
+        });
 
         if (title !== "" && choices.length > 0) {
             groups.push({
