@@ -239,6 +239,7 @@ function showMenus() {
             const itemsHtml = getItemsHtml(menu.itemsText);
             const detailId = category + "-" + index;
             const li = document.createElement("li");
+            li.id = "menu-" + index;
 
             li.innerHTML = `
                 <strong>${menu.name}</strong>：${getPriceText(menu)}
@@ -246,26 +247,27 @@ function showMenus() {
                 状態：${visibleText} / ${normalText} / ${busyText}
                 <br>
                 ${tags ? "タグ：" + tags + "<br>" : ""}
+                ${menu.options && menu.options.length > 0 ? "選択肢：" + menu.options.length + "項目<br>" : ""}
 
                 <details ${openMenuDetail === detailId ? "open" : ""}>
-    <summary onclick="
-        event.preventDefault();
+                    <summary onclick="
+                        event.preventDefault();
 
-        if(openMenuDetail === '${detailId}'){
-            openMenuDetail = null;
-        }else{
-            openMenuDetail = '${detailId}';
-        }
+                        if(openMenuDetail === '${detailId}'){
+                            openMenuDetail = null;
+                        }else{
+                        openMenuDetail = '${detailId}';
+                        }
 
-        showMenus();
-    ">
-        ${menu.image ? "詳細・写真" : "詳細"}
-    </summary>
-    ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
-    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
-    ${itemsHtml}
-    ${getOptionsHtml(menu.options)}
-    </details>
+                        showMenus();
+                         ">
+                        ${menu.image ? "詳細・写真" : "詳細"}
+                    </summary>
+                    ${menu.image ? `<img src="${menu.image}" class="menu-photo"><br>` : ""}
+                    ${menu.description ? "説明：" + menu.description + "<br>" : ""}
+                    ${itemsHtml}
+                    ${getOptionsHtml(menu.options)}
+                </details>
 
                 <div class="menu-buttons">
                     <button type="button" onclick="moveMenuUp(${index})">↑</button>
@@ -508,6 +510,11 @@ function editMenu(index) {
     openCategory = menu.category;
     document.getElementById("saveButton").textContent = "更新";
     showMenus();
+
+    window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+});
 }
 
 function deleteMenu(index) {
@@ -529,6 +536,7 @@ function moveMenuUp(index) {
 
             saveMenus();
             showMenus();
+            scrollToMenu(i);
             return;
         }
     }
@@ -546,9 +554,23 @@ function moveMenuDown(index) {
 
             saveMenus();
             showMenus();
+            scrollToMenu(i);
             return;
         }
     }
+}
+    
+function scrollToMenu(index) {
+    setTimeout(function() {
+        const target = document.getElementById("menu-" + index);
+
+        if (target) {
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+    }, 100);
 }
 
 function clearForm() {
