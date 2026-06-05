@@ -102,7 +102,23 @@ function createTableOptions() {
 }
 
 function loadMenus() {
-  menus = JSON.parse(localStorage.getItem(MENU_KEY) || "[]");
+  const savedMenus = JSON.parse(localStorage.getItem(MENU_KEY) || "[]");
+
+  const uniqueMenus = [];
+
+  savedMenus.forEach(function(menu) {
+    const sameIndex = uniqueMenus.findIndex(function(item) {
+      return item.name === menu.name;
+    });
+
+    if (sameIndex === -1) {
+      uniqueMenus.push(menu);
+    } else {
+      uniqueMenus[sameIndex] = menu;
+    }
+  });
+
+  menus = uniqueMenus;
   showMenus();
 }
 
@@ -120,24 +136,14 @@ function getVisibleChoices(option) {
   }
 
   return option.choices.filter(function(choice) {
-
-    // 旧データ対応
-    if (typeof choice === "string") {
-      return true;
-    }
-
     return choice.visible !== false;
   });
 }
 
 function getChoiceName(choice) {
-
-  if (typeof choice === "string") {
-    return choice;
-  }
-
   return choice.name;
 }
+	
 function showMenus() {
   const menuList = document.getElementById("menuList");
   const searchText = document.getElementById("searchText").value;
